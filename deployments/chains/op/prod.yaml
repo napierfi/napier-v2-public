@@ -1,0 +1,51 @@
+chain:
+  name: "Optimism Mainnet"
+  chain_id: 10
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
+    factory_impl: "0x08c83cF4B72c863Db6831e7795A22bc5d510e19a"
+    access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
+    access_manager_impl: "0xa47880eaE129Dd6dE7c6F33F343Eb368E4dDC0bc"
+
+    # Module implementations
+    constant_fee_module_impl: "0xBDf232B6806c87871F8F5654DC41603d90B9aD6E"
+    deposit_cap_verifier_module_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+    pt_blueprint: "0x208CD7DC528BD3069f09daCE8abfD548d1326a25"
+    yt_blueprint: "0x39719d3c7dFA07de67E421b5110eF171Fa6608d1"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+    share_price_resolver_blueprint: "0x0cfD2bE0749b824e7884c8fA06929816Fb407186"
+    constant_price_resolver_blueprint: "0xb01D378CAeB7CD5F84221A250F2DE0bE302c0c4a"
+    custom_conversion_resolver_blueprint: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+    external_price_resolver_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
+    twocrypto_deployer: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
+
+    # Periphery contracts
+    default_connector_factory: "0x73b57aD3504F31f53aB25b366836cdd29B38a2F3"
+    vault_connector_registry: "0x1b2386461b9CA8D39A3835770630597248597Cb5"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: "0x0000001d41857cb60F6BE0C9Fe74B9e69E1e5234"
+    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
+    quoter_impl: "0x0d27F61b4ec6cD1dF96f204DF703Ae68cd1EaC92"
+    lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
+    lens_impl: "0x17ea1FAec40431785D42C97856E26CE8a1A2B39b"
+
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: ${MULTISIG}
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+
+rpc:
+  rpc_url: ${OP_RPC_URL}
+  explorer_api_key: ${OPSCAN_API_KEY}

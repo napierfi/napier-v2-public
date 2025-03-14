@@ -1,0 +1,52 @@
+chain:
+  name: "Hyperliquid Mainnet"
+  chain_id: 999
+  contracts:
+    # Core contracts
+    factory: "0x000000488f0fB672CEc8ec4B90980e7C6E492E22"
+    factory_impl: "0x8328657f63Fea72C4B593B6Eee68e5fcf61B3373"
+    access_manager: "0x000000352a416d3dF450602527A5c50F1f67882A"
+    access_manager_impl: "0xb2df4F1581E66B85d223827EBC70BF589Db4116c"
+
+    # Module implementations
+    constant_fee_module_impl: "0x9C5Bb5aa50F184C9F708c65e66e0BFeE1Ac5fcE7"
+    deposit_cap_verifier_module_impl: "0x61BE4601187075FFBCb0A12D22C998aC495C8180"
+    pt_blueprint: "0xF2E29696005CE9CC1F8cbe547ec4B7F99844CAeA"
+    yt_blueprint: "0x916cb9d3b946131ea8eD54B7D6981637798d36F7"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x310B3431154DA64d17Ef31237ad31c0808EefD03"
+    share_price_resolver_blueprint: "0x7a26D88Efc36c2De3C0bae5e8E3D1f650a28bc97"
+    constant_price_resolver_blueprint: "0xa733D5c3938A9Cd78e65171F534954830CB5c215"
+    custom_conversion_resolver_blueprint: "0xEC4bdEad0717b9383B1a9B2b2f3A9b832ee81D4B"
+    external_price_resolver_blueprint: "0x58e575f710d87D1F946E70703397fFC9f9c08131"
+    twocrypto_deployer: "0x121E7a5948D8b0d2B3EdE1f397b7f24Ac38dE306"
+
+    # Periphery contracts
+    default_connector_factory: "0x840C146d048fBfeDbAFE7e994939849b06813729"
+    vault_connector_registry: "0xe16D0E32Ab87d50172Cd810BC48A29a6F704BAB1"
+    aggregation_router: "0x000000da6c2B49F5cf8003C511488E8f84dE29d4"
+    twocrypto_zap: "0x00000000E6B7EF2dbd507EBD55Be2bd33aC7fE9a"
+    quoter: "0x000000a060EEA80ed4a8E4d32B18cC9eB71d868a"
+    quoter_impl: "0xF4dF9FA6e4eFcDed77AEa08e5C4620ee137F82Dc"
+    lens: "0x00000059Dbde885CF1F25b58b77e4cEa773ac887"
+    lens_impl: "0x557563e67d2A72D5eE7FF0F704e0eDd74CCb724a"
+
+    createx: "0x5C3c091373Ff74c2553dD5eD2f54f95173467C3d"
+
+deployment:
+  owner: "${OWNER}"
+  deployer: "${DEPLOYER}"
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0x77777706d31920351910cdb1f00929c67ff6e69700b687653677dc65030de49f"
+    factory: "0x77777706d31920351910cdb1f00929c67ff6e6970049678d90ee579002fa3b5e"
+    twocrypto_zap: "0x77777706d31920351910cdb1f00929c67ff6e69700202484ddc14f51035abcf1"
+    quoter: "0x77777706d31920351910cdb1f00929c67ff6e6970096435d0073509601a0d5d0"
+    lens: "0x77777706d31920351910cdb1f00929c67ff6e69700821ddaf47c29d0036483eb"
+    agg_router: "0x77777706d31920351910cdb1f00929c67ff6e697002d3991a1f368b90360900c"
+
+rpc:
+  rpc_url: ${HYPER_RPC_URL}
+  explorer_api_key: ""

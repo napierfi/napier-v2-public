@@ -1,0 +1,51 @@
+chain:
+  name: "Arbitrum Mainnet"
+  chain_id: 42161
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
+    factory_impl: "0x1AF1bBA647A9cE36515DeFF7dEf988cC40038Ac5"
+    access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
+    access_manager_impl: "0xc5408eCcbb5386C75B2080e70c31Cf9054D97485"
+
+    # Module implementations
+    constant_fee_module_impl: "0x1a7169085dF04535B5ADd457f83405AEfb85Ddaf"
+    deposit_cap_verifier_module_impl: "0xB06819e0c1061d937626405D8C6D63A13Cd636A5"
+    pt_blueprint: "0x406B5FF5EB85a28710E99A9445808E5aB4F08483"
+    yt_blueprint: "0x1518496f0bbB32655A84f3211352724D7958fA06"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x067eEfB72007dde6F87514D061889D411648Aa78"
+    share_price_resolver_blueprint: "0x49d107784Ac90735fD8c45273Cd8b310b87Ad53a"
+    constant_price_resolver_blueprint: "0xAE23318d6998972dB04dD4209e55e2Fb32df5aA7"
+    custom_conversion_resolver_blueprint: "0x8a48b9878A8076Eb8cF4Ed1eFa12806E34492a35"
+    external_price_resolver_blueprint: "0x393b7dae9977fB2fCeF4F6a6aA0170F153fa44d5"
+    twocrypto_deployer: "0x34F6f5365c1b0830da9310A1d1F1b380a75ec5C8"
+
+    # Periphery contracts
+    default_connector_factory: "0x294E046bE5678e680c1eB229e9fdf6653d862efC"
+    vault_connector_registry: "0xE7144d85fe12b13243A7e7843e4Fc4BEbF9Feafb"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: "0x0000001d41857cb60F6BE0C9Fe74B9e69E1e5234"
+    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
+    quoter_impl: "0x46d5957A90d13B7b5f931c7A32d2a58c04ca286f"
+    lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
+    lens_impl: "0x0Bef39C28Ab035c1C36f96337A4F13EcbD439d1B"
+
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: ${MULTISIG}
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+
+rpc:
+  rpc_url: ${ARB_RPC_URL}
+  explorer_api_key: ${ARBSCAN_API_KEY} 

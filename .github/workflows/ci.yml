@@ -1,0 +1,87 @@
+name: Continuous Integration
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{github.workflow}}-${{github.ref}}
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "assets/**"
+      - "README.md"
+
+env:
+  ETH_RPC_URL: ${{secrets.ETH_RPC_URL}}
+  ETHERSCAN_API_KEY: ${{secrets.ETHERSCAN_API_KEY}}
+  ALCHEMY_KEY: ${{secrets.ALCHEMY_KEY}}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Check contracts are linted
+        run: forge fmt --check
+
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate fuzz seed that changes every 3 weeks to avoid burning through RPC allowance
+        run: |
+          seed=$(echo $(($EPOCHSECONDS / 1814400)))
+          echo "FOUNDRY_FUZZ_SEED=$seed" >> $GITHUB_ENV
+
+      - name: Show Foundry config
+        run: forge config
+
+      - name: Run forge tests
+        run: FOUNDRY_PROFILE=ci forge test -vvv --ffi --no-match-test=testFork
+        env:
+          ALCHEMY_KEY: ${{secrets.ALCHEMY_KEY}}
+
+  codespell:
+    name: Run codespell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run codespell
+        uses: codespell-project/actions-codespell@v2.0
+        with:
+          check_filenames: true
+          ignore_words_list: amountin
+          skip: ./.git,pnpm-lock.yaml

@@ -1,0 +1,61 @@
+chain:
+  name: "Ethereum Mainnet"
+  chain_id: 1
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
+    factory_impl: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+    access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
+    access_manager_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+
+    # Module implementations
+    constant_fee_module_impl: "0xb01D378CAeB7CD5F84221A250F2DE0bE302c0c4a"
+    deposit_cap_verifier_module_impl: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+    pt_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
+    yt_blueprint: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x913a977eCb5780de7a6e1c074D9Be427C7B7CcE0"
+    share_price_resolver_blueprint: "0x5aDAB642a68fF21e0f0FC4994C63aE7341A79Fb8"
+    constant_price_resolver_blueprint: "0xb79d712B9D6dF8a150A5a78e04FeE4C0f230f536"
+    custom_conversion_resolver_blueprint: "0x1451e304ec493b072943BFcE36c3129D20378332"
+    external_price_resolver_blueprint: "0x56B56722E03Ab2A56e70d45d6829BE9D8D3225E8"
+    twocrypto_deployer: "0x129D398a6116a13Cc0D1AE8833B0490C2D53Cf37"
+
+    # Periphery contracts
+    default_connector_factory: "0xbC955C8e9433677ab8B146E89Bc55e180484761D"
+    vault_connector_registry: "0x5F44286B6AA9D7aAEC73abcF627e32b0E048fC9a"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: "0x0000001d41857cb60F6BE0C9Fe74B9e69E1e5234"
+    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
+    lens: "0x0000006178ee874e0ae58b131b8a5fcbe78cab2f"
+    quoter_impl: "0x22cB9A13B8bd1746f9CEC5921710B3e33d2AdE98"
+    lens_impl: "0x956A1BCf039E25c1870F4748dfB72755B9d215FA"
+    impersonator: "0xC5897Bb055Bfdc5e914b89229A323B0309d85836"
+
+    # External contracts
+    wrapped_native: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+
+  # Deployment configuration
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: ${MULTISIG}
+  deploy_curve: false
+  deploy_mock: false
+
+  # Salts for deterministic deployment
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+
+# RPC configuration
+rpc:
+  rpc_url: ${ETH_RPC_URL}
+  explorer_api_key: ${ETHERSCAN_API_KEY}
+  # tenderly_access_token: ${TENDERLY_ACCESS_TOKEN}
+  # tenderly_verifier_url: ${ETH_RPC_URL}/verify/etherscan

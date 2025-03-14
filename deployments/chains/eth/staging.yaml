@@ -1,0 +1,57 @@
+chain:
+  name: "Ethereum Staging"
+  chain_id: 1
+  contracts:
+    # Core contracts
+    factory: "0x0000004852483b7425CC1078f2d634B77A78a651"
+    factory_impl: "0x876B5F550015B4c0B5483c935175c3BB055978Cd"
+    access_manager: "0x000000514D68c6Cf6577a121DBd14745F1c808A6"
+    access_manager_impl: "0xFb2DC85b101C8B861fadac0320727934136fC222"
+
+    # Module implementations
+    mock_reward_proxy_module_impl: "0x65d2d954eab5605E48a474467f7a4B22D5922158"
+    constant_fee_module_impl: "0x0bc81b348c20aDe973D27bc0153396f4C8178CF2"
+    deposit_cap_verifier_module_impl: "0xbCAA64446aE2f06Ad8cFB5b0500C842Eb23d2A70"
+    pt_blueprint: "0xaE0eDCDA44e8C343c097b0cf7262f53A45953273"
+    yt_blueprint: "0x325a57a8C44e5E0925Bc1435f2541d3c9e4cF69F"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x10b2358882c05382AF33f1e631df816d31Bb5833"
+    share_price_resolver_blueprint: "0xd73711828e6E16a12A50ecd0040d101F1774b819"
+    constant_price_resolver_blueprint: "0x44343018Aa504CBF9E33074f10DD39516A5155b5"
+    custom_conversion_resolver_blueprint: "0x7659963Fc29882aAB7bEfA9a9b054BC0077B91AF"
+    external_price_resolver_blueprint: "0xec732d866b7F74a725B3BFbF68C23c7137bCEcFf"
+    twocrypto_deployer: "0x7a67C7e193aE015EDb78e6F8107adAC9Fda12975"
+
+    # Periphery contracts
+    default_connector_factory: "0x386c2E4c1BFb1D7A8e923A6f821744D320eb93A6"
+    vault_connector_registry: "0x3fAbA1F5c3481cfD92D227Bb907f0711AbdAC498"
+    aggregation_router: "0x000000C89a0a66F731A9cb85c849Ac12ab7fCEA2"
+    twocrypto_zap: "0x0000009E8ACec15ad76ED5A1ce674010Eb8C4595"
+    quoter: "0x000000888d38dA51e0d8b63874c7803171Be41B1"
+    quoter_impl: "0x495c2d33b8942860978cef185cefa8d6c9319ceb"
+    lens: "0x000000ED34B80b22eCFA7D2af3Dcc1bEE0318FC0"
+    lens_impl: "0x1D5B7fe11D0c19A91435A744e5B52599755924f9"
+    impersonator: "0x6185ddde6161ab528cafe8c8d187be8f7210acb0"
+
+    # External contracts
+    feed_registry: "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+    wrapped_native: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
+default:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  deploy_curve: ${DEPLOY_CURVE}
+  deploy_mock: ${DEPLOY_MOCK}
+  salts:
+    napier_access_manager: ${SALT_NAPIER_ACCESS_MANAGER}
+    factory: ${SALT_FACTORY}
+    twocrypto_zap: ${SALT_TWOCRYPTO_ZAP}
+    quoter: ${SALT_QUOTER}
+    lens: ${SALT_LENS}
+    agg_router: ${SALT_AGG_ROUTER}
+
+rpc:
+  rpc_url: ${TENDERLY_ETH_STAGING_RPC_URL}
+  explorer_api_key: ${TENDERLY_ACCESS_TOKEN}
+  tenderly_verifier_url: ${TENDERLY_ETH_STAGING_RPC_URL}/verify/etherscan

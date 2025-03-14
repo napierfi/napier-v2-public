@@ -1,0 +1,184 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.10;
+
+import "forge-std/src/Test.sol";
+import {ZapForkTest} from "../shared/Fork.t.sol";
+
+import {ITwoCrypto} from "../shared/ITwoCrypto.sol";
+import "src/Types.sol";
+import "src/Constants.sol";
+import {Errors} from "src/Errors.sol";
+
+import {TwoCryptoZap} from "src/zap/TwoCryptoZap.sol";
+import {RouterPayload} from "src/modules/aggregator/AggregationRouter.sol";
+import {TwoCryptoNGPreviewLib} from "src/utils/TwoCryptoNGPreviewLib.sol";
+
+using {TokenType.intoToken} for address;
+
+contract SwapYtForAnyTokenTest is ZapForkTest {
+    bytes constant OPEN_OCEAN_SWAP_CALL_DATA =
+        hex"90411a3200000000000000000000000055877bd7f2ee37bde55ca4b271a3631f3a7ef121000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000d9a442856c234a39a81a089c06451ebaa4306a72000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000055877bd7f2ee37bde55ca4b271a3631f3a7ef12100000000000000000000000098e385f5a7e9bb5fd7a42435d14e63ed8a6570c700000000000000000000000000000000000000000000000000000000ddddb30400000000000000000000000000000000000000000000000000000000de0e2e5300000000000000000000000000000000000000000000000000000000e9be15d10000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000004400000000000000000000000000000000000000000000000000000000000000740000000000000000000000000000000000000000000000000000000000000086000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000064eb5625d9000000000000000000000000d9a442856c234a39a81a089c06451ebaa4306a72000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c800000000000000000000000000000000000000000000000000000000ddddb30400000000000000000000000000000000000000000000000000000000000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000001c452bbbe2900000000000000000000000000000000000000000000000000000000000000e000000000000000000000000055877bd7f2ee37bde55ca4b271a3631f3a7ef121000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055877bd7f2ee37bde55ca4b271a3631f3a7ef1210000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff63e0d47a6964ad1565345da9bfa66659f4983f020000000000000000000006810000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d9a442856c234a39a81a089c06451ebaa4306a720000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca000000000000000000000000000000000000000000000000000000000ddddb30400000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000002449f8654220000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca000000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000004400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000104e5b07cdb000000000000000000000000c12af0c4aa39d3061c56cd3cb19f5e62deeaebde0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000055877bd7f2ee37bde55ca4b271a3631f3a7ef12100000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000002e7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000bb8c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000648a6a1e85000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000353c1f0bc78fbbc245b3c93ef77b1dcc5b77d2a000000000000000000000000000000000000000000000000000000000e9be15d100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000001a49f865422000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000004400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000064d1660f99000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000098e385f5a7e9bb5fd7a42435d14e63ed8a6570c700000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
+    constructor() {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 21039145);
+    }
+
+    function setUp() public virtual override {
+        super.setUp();
+        bob = 0x98E385F5a7E9Bb5Fd7A42435D14e63ed8A6570c7;
+        uint256 amountWETH = 10 * 1e18;
+        vm.startPrank(alice);
+        deal(address(base), alice, amountWETH);
+        base.approve(address(target), amountWETH);
+        uint256 shares = target.deposit(amountWETH, alice);
+
+        target.approve(address(principalToken), type(uint256).max);
+
+        uint256 amountPT = principalToken.supply(shares, alice);
+
+        deal(address(base), alice, amountWETH);
+        base.approve(address(target), amountWETH);
+
+        shares = target.deposit(amountWETH, alice);
+
+        // LP tokens
+        target.approve(twocrypto.unwrap(), type(uint256).max);
+        principalToken.approve(twocrypto.unwrap(), type(uint256).max);
+        ITwoCrypto(twocrypto.unwrap()).add_liquidity([shares, amountPT], 0, alice);
+        vm.stopPrank();
+    }
+
+    function getDxOffChain(TwoCryptoZap.SwapYtParams memory params) internal view returns (ApproxValue) {
+        try this.ext_getDxOffChain(params) returns (uint256 result) {
+            return ApproxValue.wrap(result);
+        } catch {
+            vm.assume(false);
+            return ApproxValue.wrap(0);
+        }
+    }
+
+    /// @dev Helper function for `getDxOffChain` to catch the error
+    function ext_getDxOffChain(TwoCryptoZap.SwapYtParams memory params) external view returns (uint256 result) {
+        return TwoCryptoNGPreviewLib.binsearch_dx(twocrypto, TARGET_INDEX, PT_INDEX, params.principal);
+    }
+
+    /// @notice Swap YT-pufETH -> [twoCrypto] -> pufETH -> [1inch] -> WETH
+    function test_SwapYtForAnyToken() public {
+        vm.startPrank(alice);
+        uint256 amountWETH = 1 * 1e18;
+        deal(address(base), alice, amountWETH * 2);
+        base.approve(address(target), amountWETH);
+        uint256 shares = target.deposit(amountWETH, alice);
+
+        target.approve(address(principalToken), type(uint256).max);
+
+        uint256 amountYT = principalToken.issue(shares, alice);
+        uint256 ytBalance = principalToken.i_yt().balanceOf(alice);
+        principalToken.i_yt().approve(address(zap), ytBalance);
+        RouterPayload memory swapData = RouterPayload({router: OPEN_OCEAN_ROUTER, payload: OPEN_OCEAN_SWAP_CALL_DATA});
+        uint256 beforeBalanceWETH = WETH.erc20().balanceOf(bob);
+        TwoCryptoZap.SwapYtParams memory params = TwoCryptoZap.SwapYtParams({
+            twoCrypto: twocrypto,
+            tokenOut: WETH,
+            principal: amountYT,
+            receiver: bob,
+            amountOutMin: 0,
+            deadline: block.timestamp + 1 hours
+        });
+        ApproxValue getDxResult = getDxOffChain(params);
+        uint256 amountOut = zap.swapYtForAnyToken(
+            params,
+            getDxResult,
+            TwoCryptoZap.SwapTokenOutput({tokenRedeemShares: address(target).intoToken(), swapData: swapData})
+        );
+
+        assertGt(amountOut, 0, "Amount out should be greater than 0");
+        assertEq(
+            WETH.erc20().balanceOf(bob), beforeBalanceWETH + amountOut, "Bob should receive the correct amount of WETH"
+        );
+        assertNoFundLeft();
+    }
+
+    function test_RevertWhen_BadRouter() public {
+        vm.startPrank(alice);
+        uint256 amountWETH = 1 * 1e18;
+        deal(address(base), alice, amountWETH * 2);
+        base.approve(address(target), amountWETH);
+        uint256 shares = target.deposit(amountWETH, alice);
+
+        target.approve(address(principalToken), type(uint256).max);
+
+        uint256 amountYT = principalToken.issue(shares, alice);
+        principalToken.i_yt().approve(address(zap), amountYT);
+        RouterPayload memory swapData = RouterPayload({router: address(0), payload: ""});
+
+        TwoCryptoZap.SwapYtParams memory params = TwoCryptoZap.SwapYtParams({
+            twoCrypto: twocrypto,
+            tokenOut: WETH,
+            principal: amountYT,
+            receiver: bob,
+            amountOutMin: 0,
+            deadline: block.timestamp + 1 hours
+        });
+        ApproxValue getDxResult = getDxOffChain(params);
+        vm.expectRevert(Errors.AggregationRouter_UnsupportedRouter.selector);
+        zap.swapYtForAnyToken(
+            params,
+            getDxResult,
+            TwoCryptoZap.SwapTokenOutput({tokenRedeemShares: address(target).intoToken(), swapData: swapData})
+        );
+
+        vm.stopPrank();
+    }
+
+    function test_RevertWhen_InsufficientOutput() public {
+        vm.startPrank(alice);
+        uint256 amountWETH = 1 * 1e18;
+        deal(address(base), alice, amountWETH * 2);
+        base.approve(address(target), amountWETH);
+        uint256 shares = target.deposit(amountWETH, alice);
+
+        target.approve(address(principalToken), type(uint256).max);
+
+        uint256 amountYT = principalToken.issue(shares, alice);
+        principalToken.i_yt().approve(address(zap), amountYT);
+
+        RouterPayload memory swapData = RouterPayload({router: OPEN_OCEAN_ROUTER, payload: OPEN_OCEAN_SWAP_CALL_DATA});
+        TwoCryptoZap.SwapYtParams memory params = TwoCryptoZap.SwapYtParams({
+            twoCrypto: twocrypto,
+            tokenOut: WETH,
+            principal: 1 * 1e16,
+            receiver: bob,
+            amountOutMin: type(uint256).max, // Set an impossibly high minimum output
+            deadline: block.timestamp + 1 hours
+        });
+        ApproxValue getDxResult = getDxOffChain(params);
+        vm.expectRevert(Errors.Zap_InsufficientTokenOutput.selector);
+        zap.swapYtForAnyToken(
+            params,
+            getDxResult,
+            TwoCryptoZap.SwapTokenOutput({tokenRedeemShares: address(target).intoToken(), swapData: swapData})
+        );
+
+        vm.stopPrank();
+    }
+
+    function test_RevertWhen_TransactionTooOld() public {
+        RouterPayload memory swapData = RouterPayload({router: OPEN_OCEAN_ROUTER, payload: OPEN_OCEAN_SWAP_CALL_DATA});
+        TwoCryptoZap.SwapYtParams memory params = TwoCryptoZap.SwapYtParams({
+            twoCrypto: twocrypto,
+            tokenOut: USDC,
+            principal: 1 * 1e16,
+            receiver: bob,
+            amountOutMin: 0,
+            deadline: block.timestamp - 1
+        });
+        ApproxValue getDxResult = getDxOffChain(params);
+        vm.expectRevert(Errors.Zap_TransactionTooOld.selector);
+        zap.swapYtForAnyToken(
+            params,
+            getDxResult,
+            TwoCryptoZap.SwapTokenOutput({tokenRedeemShares: address(target).intoToken(), swapData: swapData})
+        );
+    }
+}

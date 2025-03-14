@@ -1,0 +1,41 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  '@openzeppelin/contracts':
+    specifier: v5.0.2
+    version: 5.0.2
+  forge-std:
+    specifier: github:foundry-rs/forge-std#v1.9.2
+    version: github.com/foundry-rs/forge-std/1714bee72e286e73f76e320d110e0eaf5c4e649d
+  halmos-cheatcodes:
+    specifier: github:a16z/halmos-cheatcodes
+    version: github.com/a16z/halmos-cheatcodes/7328abe100445fc53885c21d0e713b95293cf14c
+  solady:
+    specifier: 0.1.0
+    version: 0.1.0
+
+packages:
+
+  /@openzeppelin/contracts@5.0.2:
+    resolution: {integrity: sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==}
+    dev: false
+
+  /solady@0.1.0:
+    resolution: {integrity: sha512-hJl0uqeHkrroOnyvn+kmNKLK3PoETXIiTN7ltnmT1bnpo0PpfPYlGKHbnfQOEUEPLOPTYM5EnHLzyTVgm7NFfA==}
+    dev: false
+
+  github.com/a16z/halmos-cheatcodes/7328abe100445fc53885c21d0e713b95293cf14c:
+    resolution: {tarball: https://codeload.github.com/a16z/halmos-cheatcodes/tar.gz/7328abe100445fc53885c21d0e713b95293cf14c}
+    name: halmos-cheatcodes
+    version: 0.0.0
+    dev: false
+
+  github.com/foundry-rs/forge-std/1714bee72e286e73f76e320d110e0eaf5c4e649d:
+    resolution: {tarball: https://codeload.github.com/foundry-rs/forge-std/tar.gz/1714bee72e286e73f76e320d110e0eaf5c4e649d}
+    name: forge-std
+    version: 1.9.2
+    dev: false

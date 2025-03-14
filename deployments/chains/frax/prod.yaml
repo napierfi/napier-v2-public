@@ -1,0 +1,54 @@
+chain:
+  name: "Fraxtal Mainnet"
+  chain_id: 252
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
+    factory_impl: "0x095be57a2Bc05d390e458A5a20B2eaf77BfC48aA"
+    access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
+    access_manager_impl: "0xBbc56589E054D077BE68E6eA619cBd3b30DEdBa0"
+
+    # Module implementations
+    constant_fee_module_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+    deposit_cap_verifier_module_impl: "0x208CD7DC528BD3069f09daCE8abfD548d1326a25"
+    pt_blueprint: "0x39719d3c7dFA07de67E421b5110eF171Fa6608d1"
+    yt_blueprint: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x0cfD2bE0749b824e7884c8fA06929816Fb407186"
+    share_price_resolver_blueprint: "0xb01D378CAeB7CD5F84221A250F2DE0bE302c0c4a"
+    constant_price_resolver_blueprint: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+    custom_conversion_resolver_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
+    external_price_resolver_blueprint: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
+    twocrypto_deployer: "0x913a977eCb5780de7a6e1c074D9Be427C7B7CcE0"
+
+    # Periphery contracts
+    default_connector_factory: "0x1b2386461b9CA8D39A3835770630597248597Cb5"
+    vault_connector_registry: "0x3a45BB46fA10C053FB5D453A25846a7c2956d785"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: "0x0000001d41857cb60F6BE0C9Fe74B9e69E1e5234"
+    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
+    quoter_impl: "0x5546B45733d4F64166C6c7fA3AB02BA1506f5B0E"
+    lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
+    lens_impl: "0xB47D0132b31D19018b088c8A2504B937599F273f"
+
+    # External contracts
+    wrapped_native: "0xFC00000000000000000000000000000000000006"
+
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: ${MULTISIG}
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+
+rpc:
+  rpc_url: ${FRAX_RPC_URL}
+  explorer_api_key: ${FRAXSCAN_API_KEY} 
