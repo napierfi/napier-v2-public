@@ -1,0 +1,116 @@
+# deployments/chains/napier-devnet/dev.yaml
+# Napier VPN-only devnet deployment manifest scaffold mirroring the Ethereum production layout.
+chain:
+  name: "Napier Devnet"
+  chain_id: 31337
+  contracts:
+    # Core contracts
+    factory: ""
+    factory_impl: ""
+    access_manager: ""
+    access_manager_impl: ""
+
+    # Module implementations
+    constant_fee_module_impl: ""
+    deposit_cap_verifier_module_impl: ""
+    limit_order_config_module_impl: ""
+    morpho_reward_proxy_impl: ""
+    merkl_reward_proxy_impl: ""
+    wrapper_reward_proxy_impl: ""
+    silo_reward_proxy_impl: ""
+    pt_blueprint: ""
+    yt_blueprint: ""
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: ""
+    share_price_resolver_blueprint: ""
+    constant_price_resolver_blueprint: ""
+    custom_conversion_resolver_blueprint: ""
+    external_price_resolver_blueprint: ""
+    chainlink_resolver_blueprint: ""
+    twocrypto_deployer: ""
+
+    # Periphery contracts
+    default_connector_factory: ""
+    vault_connector_registry: ""
+    aggregation_router: ""
+    twocrypto_zap: ""
+    quoter: ""
+    lens: ""
+    quoter_impl: ""
+    lens_impl: ""
+    impersonator: ""
+    wrapper_connector_impl: ""
+    wrapper_factory: ""
+    price_provider_impl: ""
+    price_provider: ""
+    principal_token_quoter: ""
+    principal_token_quoter_impl: ""
+
+    # V4 contracts
+    pool_fee_module_impl: ""
+    toki_pool_deployer: ""
+    toki_pool_token_impl: ""
+    toki_hook: ""
+    toki_hook_logic: ""
+
+    # V4 periphery contracts
+    v4_router: ""
+    limit_order_settlement: ""
+    state_view: ""
+    toki_quoter: ""
+    toki_quoter_impl: ""
+    toki_lens: ""
+    toki_lens_impl: ""
+    toki_swap_bin_search: ""
+    toki_oracle: ""
+    toki_oracle_impl: ""
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: ""
+    toki_linear_price_oracle_impl: ""
+    toki_twap_oracle_impl: ""
+
+    # wrapper implementation
+    atoken_wrapper_impl: ""
+    convex_wrapper_impl: ""
+
+    # External contracts
+    feed_registry: ""
+    pyth_price_feed: ""
+    pyth_aggregator_v3_implementation: ""
+    pyth_oracles: []
+    wrapped_native: ""
+    pendle_router: ""
+    multicaller: ""
+    multicaller_with_sender: ""
+    multicaller_with_signer: ""
+
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: ""
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: ""
+    factory: ""
+    twocrypto_zap: ""
+    quoter: ""
+    lens: ""
+    agg_router: ""
+    toki_pool_deployer: ""
+    toki_hook: ""
+    asset_price_provider: ""
+    v4_router: ""
+    principal_token_quoter: ""
+    toki_quoter: ""
+    toki_lens: ""
+    chainlink_oracle_factory: ""
+    wrapper_factory: ""
+
+rpc:
+  # VPN-only endpoint: http://napier-devnet.napier.finance:8545
+  # Direct private RPC IP: http://10.42.101.159:8545
+  rpc_url: ${NAPIER_DEVNET_RPC_URL}
+  explorer_api_key: ""

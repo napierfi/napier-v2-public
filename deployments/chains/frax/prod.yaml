@@ -11,6 +11,8 @@ chain:
     # Module implementations
     constant_fee_module_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
     deposit_cap_verifier_module_impl: "0x208CD7DC528BD3069f09daCE8abfD548d1326a25"
+    limit_order_config_module_impl: ""
+    merkl_reward_proxy_impl: "0x06dbe7ae39c27667a9FAdaAaC9Bb7Df91063079b"
     pt_blueprint: "0x39719d3c7dFA07de67E421b5110eF171Fa6608d1"
     yt_blueprint: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
 
@@ -20,6 +22,7 @@ chain:
     constant_price_resolver_blueprint: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
     custom_conversion_resolver_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
     external_price_resolver_blueprint: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
+    chainlink_resolver_blueprint: "0x42D4b0ca80cdBDa4362ed12C07b3807dB6E46F03"
     twocrypto_deployer: "0x913a977eCb5780de7a6e1c074D9Be427C7B7CcE0"
 
     # Periphery contracts
@@ -30,7 +33,12 @@ chain:
     quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
     quoter_impl: "0x5546B45733d4F64166C6c7fA3AB02BA1506f5B0E"
     lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
-    lens_impl: "0xB47D0132b31D19018b088c8A2504B937599F273f"
+    lens_impl: "0x255a10D278E5bADE1740F9C0762Ab2D44164aBf7"
+    wrapper_connector_impl: "0xB06819e0c1061d937626405D8C6D63A13Cd636A5"
+    wrapper_factory: "0x406B5FF5EB85a28710E99A9445808E5aB4F08483"
+
+    # wrapper implementation
+    atoken_wrapper_impl: "0xAE23318d6998972dB04dD4209e55e2Fb32df5aA7"
 
     # External contracts
     wrapped_native: "0xFC00000000000000000000000000000000000006"
@@ -38,7 +46,7 @@ chain:
 deployment:
   owner: ${OWNER}
   deployer: ${DEPLOYER}
-  multisig: ${MULTISIG}
+  multisig: "0x8C244F488A742365ECB5047E78c29Ac2221ac0bf"
   deploy_curve: false
   deploy_mock: false
   salts:
@@ -51,4 +59,4 @@ deployment:
 
 rpc:
   rpc_url: ${FRAX_RPC_URL}
-  explorer_api_key: ${FRAXSCAN_API_KEY} 
+  explorer_api_key: ${FRAXSCAN_API_KEY}

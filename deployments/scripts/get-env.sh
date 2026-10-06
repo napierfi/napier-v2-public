@@ -86,6 +86,12 @@ extract_contracts_env_vars() {
     local contracts=$(yq eval '.chain.contracts | keys | .[]' "$yaml_file")
     
     for contract in $contracts; do
+        # Skip list/map values like pyth_oracles; only emit scalar contract entries.
+        local value_type=$(yq eval ".chain.contracts.$contract | type" "$yaml_file")
+        if [ "$value_type" = "!!seq" ] || [ "$value_type" = "!!map" ]; then
+            continue
+        fi
+
         # Get the value
         local value=$(yq eval ".chain.contracts.$contract" "$yaml_file")
         
@@ -156,7 +162,7 @@ extract_rpc_env_vars() {
         local env_var=$(echo "$key" | tr '[:lower:]' '[:upper:]')
         
         # Output the environment variable
-        echo "$env_var=$value"
+        echo "$env_var=\"$value\""
     done
 }
 

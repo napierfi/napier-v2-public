@@ -1,0 +1,68 @@
+chain:
+  name: "Plume Mainnet"
+  chain_id: 98866
+  contracts:
+    # Core contracts
+    factory: "0x00000081e37a462F3137C944D6bf2527eD6Afb01"
+    factory_impl: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+    access_manager: "0x000000125bbA4f1209230C336BB60B22468BD2ac"
+    access_manager_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+
+    # Module implementations
+    constant_fee_module_impl: "0xb01D378CAeB7CD5F84221A250F2DE0bE302c0c4a"
+    deposit_cap_verifier_module_impl: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+    limit_order_config_module_impl: ""
+    morpho_reward_proxy_impl: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
+    merkl_reward_proxy_impl: "0xE3685D742F6713f35a92bf5938abE7BFBC162218"
+    wrapper_reward_proxy_impl: "0x0000000000000000000000000000000000000000"
+    pt_blueprint: "0x1451e304ec493b072943BFcE36c3129D20378332"
+    yt_blueprint: "0x56B56722E03Ab2A56e70d45d6829BE9D8D3225E8"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x129D398a6116a13Cc0D1AE8833B0490C2D53Cf37"
+    share_price_resolver_blueprint: "0x1f3c6E9A11B3DC5C1bd3B48B7f17280F3d5631a1"
+    constant_price_resolver_blueprint: "0xa59fD91E75ee0f366633541B185B531B791E3C03"
+    custom_conversion_resolver_blueprint: "0x0543D17B71d6870C06f9991646e325093ba7790D"
+    external_price_resolver_blueprint: "0x641981084b86c2EC57302a134C30e9b0ef759f32"
+    chainlink_resolver_blueprint: "0x8a48b9878A8076Eb8cF4Ed1eFa12806E34492a35"
+    twocrypto_deployer: "0x393b7dae9977fB2fCeF4F6A6aA0170F153fa44d5"
+
+    # Periphery contracts
+    default_connector_factory: "0x4c31Ecd511Bb974AC10bDd060851333cC2918AEE"
+    vault_connector_registry: "0x0d67E4C6e2bE3Ba6B76D648b49cb71c45bCDb1eF"
+    aggregation_router: "0x0000003B55d3e48aB4574C3c5f0dC9e825F4BA80"
+    twocrypto_zap: "0x000000E723320002c4679Cb67F61A461d90356Fa"
+    quoter: "0x00000056b4Fdfe80293DF78eC8730263F2b3FBBE"
+    lens: "0x0000006637d4D7aF9200306968fB05E7974E8E02"
+    quoter_impl: "0x6ae01e160d148028D67B9c86dCC0892d118dBbDA"
+    lens_impl: "0x8122b9e43a88eAF4177e09d006e529978Eef1A7b"
+    impersonator: "0x0000000000000000000000000000000000000000"
+    wrapper_connector_impl: "0x294E046bE5678e680c1eB229e9fdf6653d862efC"
+    wrapper_factory: "0xE7144d85fe12b13243A7e7843e4Fc4BEbF9Feafb"
+
+    # wrapper implementation
+    atoken_wrapper_impl: "0x0Bef39C28Ab035c1C36f96337A4F13EcbD439d1B"
+
+  # Deployment configuration
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: "0x190aA072be986f154FD9894DBC98DE3003d4a1A7"
+  deploy_curve: false
+  deploy_mock: false
+
+  # Salts for deterministic deployment
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb9004fa656ab223781006ef660"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb900d7d61b342d2074038a3db0"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb900e4ad638350eabc027e83ef"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb90083cfd2730322c401357125"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900362fe668545bf002d90597"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900a9d6216db0492c0274aef7"
+
+# RPC configuration
+rpc:
+  rpc_url: ${PLUME_RPC_URL}
+  explorer_api_key: "non-key"
+  verifier: blockscout
+  verifier_url: https://explorer-plume-mainnet-1.t.conduit.xyz/api/

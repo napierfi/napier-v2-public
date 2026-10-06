@@ -1,0 +1,109 @@
+# deployments/chains/tempo/prod.yaml
+# Tempo mainnet deployment manifest scaffold mirroring the Ethereum production layout.
+# Why: lets the deployment helpers treat Tempo like other production chains before addresses are finalized.
+chain:
+  name: "Tempo Mainnet"
+  chain_id: 4217
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbca1e8cf82fe458b33c9954a65b987b"
+    factory_impl: "0x06f7555441ded67f4f42f5fedbeed4a2eb6a3afa"
+    access_manager: "0x000000c196dbd8c8b737f95507c2c39271cdcc99"
+    access_manager_impl: "0x08c83cf4b72c863db6831e7795a22bc5d510e19a"
+
+    # Module implementations
+    mock_reward_proxy_module_impl: ""
+    constant_fee_module_impl: "0x39719d3c7dFA07de67E421b5110eF171Fa6608d1"
+    deposit_cap_verifier_module_impl: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+    limit_order_config_module_impl: ""
+    morpho_reward_proxy_impl: ""
+    merkl_reward_proxy_impl: ""
+    wrapper_reward_proxy_impl: ""
+    silo_reward_proxy_impl: ""
+    pt_blueprint: "0xb01d378caeb7cd5f84221a250f2de0be302c0c4a"
+    yt_blueprint: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
+    share_price_resolver_blueprint: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
+    constant_price_resolver_blueprint: "0x913a977eCb5780de7a6e1c074D9Be427C7B7CcE0"
+    custom_conversion_resolver_blueprint: "0x5aDAB642a68fF21e0f0FC4994C63aE7341A79Fb8"
+    external_price_resolver_blueprint: "0xb79d712B9D6dF8a150A5a78e04FeE4C0f230f536"
+    chainlink_resolver_blueprint: "0x1451e304ec493b072943BFcE36c3129D20378332"
+    twocrypto_deployer: ""
+
+    # Periphery contracts
+    default_connector_factory: "0x2cC49a9671067a481797A19E0Dd017592B824dD7"
+    vault_connector_registry: "0xBF33031BD2C04531E688adB5E517e5477c2A9367"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: ""
+    quoter: ""
+    lens: ""
+    quoter_impl: ""
+    lens_impl: ""
+    impersonator: ""
+    wrapper_connector_impl: "0x6ae01e160d148028d67b9c86dcc0892d118dbbda"
+    wrapper_factory: "0x44445c34daf19cf0d7721ecf4be42f2538ac00c8"
+    price_provider_impl: "0x42D4b0ca80cdBDa4362ed12C07b3807dB6E46F03"
+    price_provider: "0x000000bA92d1f66c46722F0f4c035515d2b006A3"
+    principal_token_quoter: "0x0000003db4b656AbDEB9860a924AC59459ECFB41"
+    principal_token_quoter_impl: "0x49d107784ac90735fd8c45273cd8b310b87ad53a"
+
+    # V4 contracts
+    pool_fee_module_impl: "0x17ea1FAec40431785D42C97856E26CE8a1A2B39b"
+    toki_pool_deployer: "0x3333fa2BEd91533D8Fe0F1B641582343A8529469"
+    toki_pool_token_impl: "0xB47D0132b31D19018b088c8A2504B937599F273f"
+    toki_hook: "0xb046529771f5d01974913056843f1f0f77d81888"
+    toki_hook_logic: "0x0d27F61b4ec6cD1dF96f204DF703Ae68cd1EaC92"
+
+    # V4 periphery contracts
+    v4_router: "0x00000000D6C19A173f3C739F01fD171A7C9C245b"
+    state_view: "0x067eEfB72007dde6F87514D061889D411648Aa78"
+    toki_quoter: "0x000000f682bfa913574bfa448c33260cb598cfc7"
+    toki_quoter_impl: "0x393b7dae9977fb2fcef4f6a6aa0170f153fa44d5"
+    toki_lens: "0x00000031f662013d68e6cd0cefe97043ae0ac5b8"
+    toki_lens_impl: "0x8a48b9878A8076Eb8cF4Ed1eFa12806E34492a35"
+    toki_swap_bin_search: "0x1a7169085dF04535B5ADd457f83405AEfb85Ddaf"
+    toki_oracle: "0x1Fd527Ffb5ce86629E49aB93323431D93cAdB179"
+    toki_oracle_impl: "0x34f6f5365c1b0830da9310a1d1f1b380a75ec5c8"
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: "0x00000013f81b2e719d7183cfdd9f0e46cfbc8564"
+    toki_linear_price_oracle_impl: "0x22cB9A13B8bd1746f9CEC5921710B3e33d2AdE98"
+    toki_twap_oracle_impl: "0x956A1BCf039E25c1870F4748dfB72755B9d215FA"
+
+    # External contracts
+    feed_registry: ""
+    wrapped_native: "0xBbBcC62853a5fA27b93d6Bab3E6F7ce841E25Df2"
+    pendle_router: ""
+    multicaller: ""
+    multicaller_with_sender: ""
+    multicaller_with_signer: ""
+
+deployment:
+  owner: ${OWNER}
+  deployer: ${DEPLOYER}
+  multisig: "0x63f4269d5D3623be842313c81C00826A752ee9F6"
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+    toki_pool_deployer: "0xc8192ad85b620da91493819257aa8605d948cdb900d1f75b78e60bff038a56d8"
+    toki_hook: "0xc8192ad85b620da91493819257aa8605d948cdb900be6b6c031463e6030be1e9"
+    asset_price_provider: "0xc8192ad85b620da91493819257aa8605d948cdb9004847285bdcbf3e03bbebc4"
+    v4_router: "0xc8192ad85b620da91493819257aa8605d948cdb900e94a774142e93c027f1310"
+    principal_token_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900ab90f1adfb3c7003e186f8"
+    toki_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900197aed04016ad002242344"
+    toki_lens: "0xc8192ad85b620da91493819257aa8605d948cdb90001f07047ef44a80386a5f1"
+    chainlink_oracle_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900be36a1129753ee02cfcd49"
+    wrapper_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900ff49436984e9ee03459a3f"
+
+rpc:
+  rpc_url: ${TEMPO_RPC_URL}
+  explorer_api_key: ""
+  verifier_url: https://contracts.tempo.xyz
