@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 // https://gist.github.com/Vectorized/ebb23b2b5395b6d6aa83fc36af98a18c

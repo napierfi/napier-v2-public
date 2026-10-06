@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 /// @dev Forked from https://github.com/Vectorized/solady/blob/45bba1221ad451289d2f54c2f7f48aea624e17aa/test/utils/Brutalizer.sol

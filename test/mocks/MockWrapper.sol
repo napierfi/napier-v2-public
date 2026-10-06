@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import {ERC20} from "solady/src/tokens/ERC20.sol";
@@ -7,12 +7,12 @@ import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";
 import {LibClone} from "solady/src/utils/LibClone.sol";
 
 import {IWETH} from "src/interfaces/IWETH.sol";
-import {IERC4626Wrapper} from "src/wrapper/IERC4626Wrapper.sol";
+import {IWrapper} from "src/wrapper/IWrapper.sol";
 
 import "src/Types.sol";
 
 /// @dev Mock wrapper for testing purposes 1:1 exchange rate with original ERC4626 vault shares
-contract MockWrapper is IERC4626Wrapper, ERC20 {
+contract MockWrapper is IWrapper, ERC20 {
     ERC4626 s_vault;
     IWETH s_weth;
     bool s_initialized;
@@ -95,10 +95,19 @@ contract MockWrapper is IERC4626Wrapper, ERC20 {
         return s_vault.previewRedeem(shares);
     }
 
+    function convertToAssets(uint256 shares) external view returns (uint256) {
+        return s_vault.convertToAssets(shares);
+    }
+
+    function convertToShares(uint256 assets) external view returns (uint256) {
+        return s_vault.convertToShares(assets);
+    }
+
+    /// @dev It doesn't return the native token
     function getTokenInList() public view returns (Token[] memory) {
         Token[] memory tokens = new Token[](2);
         tokens[0] = Token.wrap(s_vault.asset());
-        tokens[1] = Token.wrap(address(s_weth));
+        tokens[1] = Token.wrap(vault());
         return tokens;
     }
 

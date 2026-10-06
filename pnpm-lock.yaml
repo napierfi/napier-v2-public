@@ -1,41 +1,265 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@openzeppelin/contracts':
-    specifier: v5.0.2
-    version: 5.0.2
-  forge-std:
-    specifier: github:foundry-rs/forge-std#v1.9.2
-    version: github.com/foundry-rs/forge-std/1714bee72e286e73f76e320d110e0eaf5c4e649d
-  halmos-cheatcodes:
-    specifier: github:a16z/halmos-cheatcodes
-    version: github.com/a16z/halmos-cheatcodes/7328abe100445fc53885c21d0e713b95293cf14c
-  solady:
-    specifier: 0.1.0
-    version: 0.1.0
+importers:
+
+  .:
+    dependencies:
+      '@openzeppelin/contracts':
+        specifier: v5.0.2
+        version: 5.0.2
+      '@uniswap/permit2':
+        specifier: github:Uniswap/permit2
+        version: https://codeload.github.com/Uniswap/permit2/tar.gz/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219
+      '@uniswap/universal-router':
+        specifier: github:Uniswap/universal-router#3663f6db6e2fe121753cd2d899699c2dc75dca86
+        version: https://codeload.github.com/Uniswap/universal-router/tar.gz/3663f6db6e2fe121753cd2d899699c2dc75dca86
+      '@uniswap/v4-core':
+        specifier: github:Uniswap/v4-core#d9f8bfd39070b6114f2cf6c49df570fd6f998edb
+        version: https://codeload.github.com/Uniswap/v4-core/tar.gz/d9f8bfd39070b6114f2cf6c49df570fd6f998edb
+      '@uniswap/v4-periphery':
+        specifier: github:Uniswap/v4-periphery#9628c36b4f5083d19606e63224e4041fe748edae
+        version: https://codeload.github.com/Uniswap/v4-periphery/tar.gz/9628c36b4f5083d19606e63224e4041fe748edae
+      forge-std:
+        specifier: github:foundry-rs/forge-std#v1.9.7
+        version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/77041d2ce690e692d6e03cc812b57d1ddaa4d505
+      halmos-cheatcodes:
+        specifier: github:a16z/halmos-cheatcodes
+        version: https://codeload.github.com/a16z/halmos-cheatcodes/tar.gz/7328abe100445fc53885c21d0e713b95293cf14c
+      multicaller:
+        specifier: github:Vectorized/multicaller
+        version: https://codeload.github.com/Vectorized/multicaller/tar.gz/cf462935512939597d1c914aded4677df0b19538
+      solady:
+        specifier: 0.1.0
+        version: 0.1.0
+      solmate:
+        specifier: ^6.8.0
+        version: 6.8.0
+    devDependencies:
+      '@pythnetwork/pyth-sdk-solidity':
+        specifier: ^4.3.1
+        version: 4.3.1
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      viem:
+        specifier: ^2.23.10
+        version: 2.23.10
 
 packages:
 
-  /@openzeppelin/contracts@5.0.2:
+  '@adraffy/ens-normalize@1.11.0':
+    resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
+
+  '@noble/curves@1.8.1':
+    resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
+    engines: {node: ^14.21.3 || >=16}
+
+  '@noble/hashes@1.7.1':
+    resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
+    engines: {node: ^14.21.3 || >=16}
+
+  '@openzeppelin/contracts@5.0.2':
     resolution: {integrity: sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==}
-    dev: false
 
-  /solady@0.1.0:
-    resolution: {integrity: sha512-hJl0uqeHkrroOnyvn+kmNKLK3PoETXIiTN7ltnmT1bnpo0PpfPYlGKHbnfQOEUEPLOPTYM5EnHLzyTVgm7NFfA==}
-    dev: false
+  '@pythnetwork/pyth-sdk-solidity@4.3.1':
+    resolution: {integrity: sha512-dAzsVDSKXS/Tbhik5Hp2kix3vDp98SlCXmputDIOkVyF4SKKnhXmIn+iGVmSQdrlF9jCFtvjBj7XYP+9wwpA4A==}
+    engines: {node: '>=22.14.0'}
 
-  github.com/a16z/halmos-cheatcodes/7328abe100445fc53885c21d0e713b95293cf14c:
+  '@scure/base@1.2.4':
+    resolution: {integrity: sha512-5Yy9czTO47mqz+/J8GM6GIId4umdCk1wc1q8rKERQulIoc8VP9pzDcghv10Tl2E7R96ZUx/PhND3ESYUQX8NuQ==}
+
+  '@scure/bip32@1.6.2':
+    resolution: {integrity: sha512-t96EPDMbtGgtb7onKKqxRLfE5g05k7uHnHRM2xdE6BP/ZmxaLtPek4J4KfVn/90IQNrU1IOAqMgiDtUdtbe3nw==}
+
+  '@scure/bip39@1.5.4':
+    resolution: {integrity: sha512-TFM4ni0vKvCfBpohoh+/lY05i9gRbSwXWngAsF4CABQxoaOHijxuaZ2R6cStDQ5CHtHO9aGJTr4ksVJASRRyMA==}
+
+  '@uniswap/permit2@https://codeload.github.com/Uniswap/permit2/tar.gz/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219':
+    resolution: {tarball: https://codeload.github.com/Uniswap/permit2/tar.gz/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219}
+    version: 1.0.0
+
+  '@uniswap/universal-router@https://codeload.github.com/Uniswap/universal-router/tar.gz/3663f6db6e2fe121753cd2d899699c2dc75dca86':
+    resolution: {tarball: https://codeload.github.com/Uniswap/universal-router/tar.gz/3663f6db6e2fe121753cd2d899699c2dc75dca86}
+    version: 2.0.0
+    engines: {node: '>=14'}
+
+  '@uniswap/v2-core@1.0.1':
+    resolution: {integrity: sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==}
+    engines: {node: '>=10'}
+
+  '@uniswap/v3-core@1.0.0':
+    resolution: {integrity: sha512-kSC4djMGKMHj7sLMYVnn61k9nu+lHjMIxgg9CDQT+s2QYLoA56GbSK9Oxr+qJXzzygbkrmuY6cwgP6cW2JXPFA==}
+    engines: {node: '>=10'}
+
+  '@uniswap/v4-core@https://codeload.github.com/Uniswap/v4-core/tar.gz/d9f8bfd39070b6114f2cf6c49df570fd6f998edb':
+    resolution: {tarball: https://codeload.github.com/Uniswap/v4-core/tar.gz/d9f8bfd39070b6114f2cf6c49df570fd6f998edb}
+    version: 1.0.1
+
+  '@uniswap/v4-periphery@https://codeload.github.com/Uniswap/v4-periphery/tar.gz/9628c36b4f5083d19606e63224e4041fe748edae':
+    resolution: {tarball: https://codeload.github.com/Uniswap/v4-periphery/tar.gz/9628c36b4f5083d19606e63224e4041fe748edae}
+    version: 1.0.1
+
+  abitype@1.0.8:
+    resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.22.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+    engines: {node: '>=12'}
+
+  eventemitter3@5.0.1:
+    resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+
+  forge-std@https://codeload.github.com/foundry-rs/forge-std/tar.gz/77041d2ce690e692d6e03cc812b57d1ddaa4d505:
+    resolution: {tarball: https://codeload.github.com/foundry-rs/forge-std/tar.gz/77041d2ce690e692d6e03cc812b57d1ddaa4d505}
+    version: 1.9.7
+
+  halmos-cheatcodes@https://codeload.github.com/a16z/halmos-cheatcodes/tar.gz/7328abe100445fc53885c21d0e713b95293cf14c:
     resolution: {tarball: https://codeload.github.com/a16z/halmos-cheatcodes/tar.gz/7328abe100445fc53885c21d0e713b95293cf14c}
-    name: halmos-cheatcodes
     version: 0.0.0
-    dev: false
 
-  github.com/foundry-rs/forge-std/1714bee72e286e73f76e320d110e0eaf5c4e649d:
-    resolution: {tarball: https://codeload.github.com/foundry-rs/forge-std/tar.gz/1714bee72e286e73f76e320d110e0eaf5c4e649d}
-    name: forge-std
-    version: 1.9.2
-    dev: false
+  isows@1.0.6:
+    resolution: {integrity: sha512-lPHCayd40oW98/I0uvgaHKWCSvkzY27LjWLbtzOm64yQ+G3Q5npjjbdppU65iZXkK1Zt+kH9pfegli0AYfwYYw==}
+    peerDependencies:
+      ws: '*'
+
+  multicaller@https://codeload.github.com/Vectorized/multicaller/tar.gz/cf462935512939597d1c914aded4677df0b19538:
+    resolution: {tarball: https://codeload.github.com/Vectorized/multicaller/tar.gz/cf462935512939597d1c914aded4677df0b19538}
+    version: 1.3.2
+
+  ox@0.6.9:
+    resolution: {integrity: sha512-wi5ShvzE4eOcTwQVsIPdFr+8ycyX+5le/96iAJutaZAvCes1J0+RvpEPg5QDPDiaR0XQQAvZVl7AwqQcINuUug==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  solady@0.1.0:
+    resolution: {integrity: sha512-hJl0uqeHkrroOnyvn+kmNKLK3PoETXIiTN7ltnmT1bnpo0PpfPYlGKHbnfQOEUEPLOPTYM5EnHLzyTVgm7NFfA==}
+
+  solmate@6.8.0:
+    resolution: {integrity: sha512-/oI8kgEvSxGG1mrFv3FmCEZd0F8Z9VzRmoYMIhzmmzt6mjtPwfdCm3oh8yOL7bMHJBSfXJuMpnMPrM0uyaKsKg==}
+
+  viem@2.23.10:
+    resolution: {integrity: sha512-va6Wde+v96PdfzdPEspCML1MjAqe+88O8BD+R9Kun/4s5KMUNcqfHbXdZP0ZZ2Zms80styvH2pDRAqCho6TqkA==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  ws@8.18.1:
+    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+snapshots:
+
+  '@adraffy/ens-normalize@1.11.0': {}
+
+  '@noble/curves@1.8.1':
+    dependencies:
+      '@noble/hashes': 1.7.1
+
+  '@noble/hashes@1.7.1': {}
+
+  '@openzeppelin/contracts@5.0.2': {}
+
+  '@pythnetwork/pyth-sdk-solidity@4.3.1': {}
+
+  '@scure/base@1.2.4': {}
+
+  '@scure/bip32@1.6.2':
+    dependencies:
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.4
+
+  '@scure/bip39@1.5.4':
+    dependencies:
+      '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.4
+
+  '@uniswap/permit2@https://codeload.github.com/Uniswap/permit2/tar.gz/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219': {}
+
+  '@uniswap/universal-router@https://codeload.github.com/Uniswap/universal-router/tar.gz/3663f6db6e2fe121753cd2d899699c2dc75dca86':
+    dependencies:
+      '@openzeppelin/contracts': 5.0.2
+      '@uniswap/v2-core': 1.0.1
+      '@uniswap/v3-core': 1.0.0
+
+  '@uniswap/v2-core@1.0.1': {}
+
+  '@uniswap/v3-core@1.0.0': {}
+
+  '@uniswap/v4-core@https://codeload.github.com/Uniswap/v4-core/tar.gz/d9f8bfd39070b6114f2cf6c49df570fd6f998edb': {}
+
+  '@uniswap/v4-periphery@https://codeload.github.com/Uniswap/v4-periphery/tar.gz/9628c36b4f5083d19606e63224e4041fe748edae': {}
+
+  abitype@1.0.8: {}
+
+  dotenv@16.4.7: {}
+
+  eventemitter3@5.0.1: {}
+
+  forge-std@https://codeload.github.com/foundry-rs/forge-std/tar.gz/77041d2ce690e692d6e03cc812b57d1ddaa4d505: {}
+
+  halmos-cheatcodes@https://codeload.github.com/a16z/halmos-cheatcodes/tar.gz/7328abe100445fc53885c21d0e713b95293cf14c: {}
+
+  isows@1.0.6(ws@8.18.1):
+    dependencies:
+      ws: 8.18.1
+
+  multicaller@https://codeload.github.com/Vectorized/multicaller/tar.gz/cf462935512939597d1c914aded4677df0b19538: {}
+
+  ox@0.6.9:
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
+      abitype: 1.0.8
+      eventemitter3: 5.0.1
+    transitivePeerDependencies:
+      - zod
+
+  solady@0.1.0: {}
+
+  solmate@6.8.0: {}
+
+  viem@2.23.10:
+    dependencies:
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
+      abitype: 1.0.8
+      isows: 1.0.6(ws@8.18.1)
+      ox: 0.6.9
+      ws: 8.18.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+
+  ws@8.18.1: {}

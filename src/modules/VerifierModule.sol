@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {LibClone} from "solady/src/utils/LibClone.sol";
@@ -75,13 +75,28 @@ contract DepositCapVerifierModule is VerifierModule {
     /// @notice Global deposit cap in unit of the underlying token.
     uint256 internal s_depositCap;
 
+    /// @notice Emitted when the module's deposit cap state changes.
+    /// @dev During `initialize()` on a newly deployed clone, `oldDepositCap` is always `0`
+    /// because clone storage starts empty on module replacement.
+    event DepositCapUpdated(uint256 oldDepositCap, uint256 newDepositCap);
+
+    /// @dev Upgrade behavior note:
+    /// - `Factory.updateModules()` deploys a fresh clone and calls `initialize()`.
+    /// - This module reads cap only from clone immutable args.
+    /// - It does NOT read prior module storage or emit a cap-change continuity event during upgrades.
+    /// Curators should pass the intended cap in `immutableData` when replacing this module.
     function initialize() external override initializer {
         (, bytes memory args) = abi.decode(LibClone.argsOnClone(address(this)), (address, bytes));
-        s_depositCap = abi.decode(args, (uint256));
+        uint256 cap = abi.decode(args, (uint256));
+        s_depositCap = cap;
+
+        emit DepositCapUpdated(0, cap);
     }
 
     function setDepositCap(uint256 cap) external restricted {
+        uint256 oldDepositCap = s_depositCap;
         s_depositCap = cap;
+        emit DepositCapUpdated(oldDepositCap, cap);
     }
 
     function depositCap() public view override returns (uint256 maxShares) {

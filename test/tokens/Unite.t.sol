@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -188,7 +188,7 @@ contract UnitePostSettlementTest is PrincipalTokenTest {
 
 contract PreviewUniteTest is PrincipalTokenTest {
     /// @notice Test `previewUnite` function
-    function testFuzz_Preview(Init memory init, uint256 shares, uint64 timeJump, FeePcts newFeePcts)
+    function testFuzz_Preview(Init memory init, uint256 shares, uint32 timeJump, FeePcts newFeePcts)
         public
         boundInit(init)
     {

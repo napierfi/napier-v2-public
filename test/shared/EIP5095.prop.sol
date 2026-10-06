@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
-import {Base} from "../Base.t.sol";
-
+import {Base} from "../TwoCryptoBase.t.sol";
 import "../Property.sol" as Property;
 
 import {ERC20} from "solady/src/tokens/ERC20.sol";
@@ -37,7 +36,11 @@ abstract contract EIP5095PropertyPlus is Base {
 
     modifier boundInit(Init memory init) virtual {
         for (uint256 i = 0; i < N; i++) {
-            vm.assume(_isEOA(init.user[i]) && init.user[i] != address(0));
+            // Exclude Permit2 address as it has special allowance handling in Solady ERC20
+            vm.assume(
+                _isEOA(init.user[i]) && init.user[i] != address(0)
+                    && init.user[i] != address(0x000000000022D473030F116dDEE9F6B43aC78BA3)
+            );
             init.share[i] = bound(init.share[i], 0, 1e10 * tOne);
             init.principal[i] = bound(init.principal[i], 0, 1e10 * tOne);
         }

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {SSTORE2} from "solady/src/utils/SSTORE2.sol";
@@ -14,6 +14,10 @@ library ModuleAccessor {
         assembly {
             m := add(data, 0x40) // Grab the encoded array
         }
+    }
+
+    function get(address pointer, ModuleIndex idx) internal view returns (address module) {
+        return get(read(pointer), idx);
     }
 
     /// @notice Get a module address by index.

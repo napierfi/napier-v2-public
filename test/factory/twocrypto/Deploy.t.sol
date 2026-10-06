@@ -1,23 +1,26 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
-import {Base} from "../../Base.t.sol";
+import {TwoCryptoBase} from "../../TwoCryptoBase.t.sol";
+import {ITwoCrypto} from "../../shared/twocrypto/ITwoCrypto.sol";
+import {SaltMiner} from "../../SaltMiner.sol";
+
+import {SafeCastLib} from "solady/src/utils/SafeCastLib.sol";
 
 import {Factory} from "src/Factory.sol";
 import {PrincipalToken} from "src/tokens/PrincipalToken.sol";
 import {YieldToken} from "src/tokens/YieldToken.sol";
 import {AccessManager} from "src/modules/AccessManager.sol";
+import {FeePctsLib} from "src/modules/FeeModule.sol";
 
 import {TokenNameLib} from "src/utils/TokenNameLib.sol";
+import {LibBlueprint} from "src/utils/LibBlueprint.sol";
+
 import {FeePcts, FEE_MODULE_INDEX} from "src/Types.sol";
 import {Errors} from "src/Errors.sol";
-import {FeePctsLib} from "src/modules/FeeModule.sol";
-import {SafeCastLib} from "solady/src/utils/SafeCastLib.sol";
 import "src/Constants.sol" as Constants;
 
-import {ITwoCrypto} from "../../shared/ITwoCrypto.sol";
-
-contract DeployTest is Base {
+contract DeployTest is TwoCryptoBase {
     using SafeCastLib for uint256;
 
     function setUp() public override {
@@ -26,7 +29,16 @@ contract DeployTest is Base {
         _setUpModules();
     }
 
-    function test_DeploySuccessfully() public {
+    function test_DeployNonDeterministic() public {
+        _test_Deploy(bytes32(0));
+    }
+
+    function test_DeployDeterministic() public {
+        bytes32 salt = keccak256("ABC");
+        _test_Deploy(salt);
+    }
+
+    function _test_Deploy(bytes32 salt) internal {
         Factory.Suite memory suite = Factory.Suite({
             accessManagerImpl: accessManager_logic,
             ptBlueprint: pt_blueprint,
@@ -45,7 +57,13 @@ contract DeployTest is Base {
 
         uint256 expiry = block.timestamp + 365 days;
 
-        (address p, address y, address pool) = factory.deploy(suite, params, expiry, curator);
+        (address p, address y, address pool) = salt == bytes32(0)
+            ? factory.deploy(suite, params, expiry, curator)
+            : factory.deployDeterministic(suite, params, expiry, curator, salt);
+
+        if (salt != bytes32(0)) {
+            assertEq(p, SaltMiner.predictPrincipalTokenAddress(address(factory), address(this), salt, pt_blueprint));
+        }
 
         // Assertions
         assertTrue(p != address(0), "PrincipalToken should be deployed");

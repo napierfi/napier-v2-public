@@ -1,26 +1,61 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "./types/Token.sol" as TokenType;
+import {asAddressArray} from "./types/Token.sol";
 import "./types/FeePcts.sol" as FeePctsType;
 import "./types/ApproxValue.sol" as ApproxValueType;
+import "./types/ApproximationParams.sol";
 import "./types/TwoCrypto.sol" as TwoCryptoType;
 import "./types/ModuleIndex.sol" as ModuleIndexType;
+import "./types/FeePctsPool.sol" as FeePctsPoolType;
+import {Packing} from "./types/Packing.sol";
+import "./types/Flags.sol" as Flags16Type;
+
+/// @notice The `Flags16` type is 16 bits long. Each bit represents a flag.
+type Flags16 is uint16;
+
+using {Flags16Type.unwrap} for Flags16 global;
+
+/// @notice The `Uint128x2` type is 256 bits packed with two 128 bits values.
+type Uint128x2 is uint256;
+
+using {Packing.unwrap} for Uint128x2 global;
+using {Packing.unpack} for Uint128x2 global;
+using {Packing.value0} for Uint128x2 global;
+using {Packing.value1} for Uint128x2 global;
+using {Packing.add} for Uint128x2 global;
+using {Packing.radd} for Uint128x2 global;
+using {Packing.sub} for Uint128x2 global;
 
 /// The `FeePcts` type is 256 bits long, and packs the following:
 ///
 /// ```
-///   | [uint176]: reserved for future use
+///   | [uint160]: reserved for future use
 ///   |                                           | [uint16]: postSettlementFeePct
 ///   |                                           ↓   | [uint16]: redemptionFeePct
 ///   |                                           ↓   ↓   | [uint16]: performanceFeePct
 ///   |                                           ↓   ↓   ↓   | [uint16]: issuanceFeePct
-///   |                                           ↓   ↓   ↓   ↓   ↓ [uint16]: splitPctBps
-/// 0x00000000000000000000000000000000000000000000AAAABBBBCCCCDDDDEEEE
+///   |                                           ↓   ↓   ↓   ↓   ↓ [uint16]: PrincipalToken splitPctBps
+/// 0x000000000000000000000000000000000000AAAABBBBCCCCDDDDEEEEFFFFGGGG
 /// ```
+
 type FeePcts is uint256;
 
 using {FeePctsType.unwrap} for FeePcts global;
+
+/// The `FeePctsPool` type is 256 bits long, and packs the following:
+///
+/// ```
+///   | [uint96]: reserved for future use
+///   |                        | [uint16]: reserveFeePct
+///   |                        ↓   | [uint128]: ammFeeParams
+///   |                        ↓   ↓                               ↓ [uint16]: splitFeePct
+/// 0x0000000000000000000000000AAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBCCCC
+/// ```
+type FeePctsPool is uint256;
+
+using {FeePctsPoolType.unwrap} for FeePctsPool global;
 
 /// The `ApproxValue` type represents an approximate value from off-chain sources or `Quoter` contract.
 type ApproxValue is uint256;
@@ -91,7 +126,8 @@ type ModuleIndex is uint256;
 ModuleIndex constant FEE_MODULE_INDEX = ModuleIndex.wrap(0);
 ModuleIndex constant REWARD_PROXY_MODULE_INDEX = ModuleIndex.wrap(1);
 ModuleIndex constant VERIFIER_MODULE_INDEX = ModuleIndex.wrap(2);
-uint256 constant MAX_MODULES = 3;
+ModuleIndex constant POOL_FEE_MODULE_INDEX = ModuleIndex.wrap(3);
+uint256 constant MAX_MODULES = 4;
 
 /// @dev Do not change the order of the enum
 /// @dev Verification status codes in the system for the `VerifierModule`.

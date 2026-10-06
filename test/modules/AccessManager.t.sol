@@ -1,9 +1,30 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
-import {AccessManager} from "src/modules/AccessManager.sol";
+
+import {AccessManager, AccessManaged} from "src/modules/AccessManager.sol";
+
 import {LibClone} from "solady/src/utils/LibClone.sol";
+import {MulticallerEtcher} from "multicaller/src/MulticallerEtcher.sol";
+import {MulticallerWithSender} from "multicaller/src/MulticallerWithSender.sol";
+
+contract AccessManagedMock is AccessManaged {
+    AccessManager private immutable _i_accessManager;
+    uint256 private _value;
+
+    constructor(AccessManager _accessManager) {
+        _i_accessManager = _accessManager;
+    }
+
+    function i_accessManager() public view override returns (AccessManager) {
+        return _i_accessManager;
+    }
+
+    function doSomething() public restricted {
+        _value += 10;
+    }
+}
 
 contract AccessManagerTest is Test {
     uint256 constant _ROLE_0 = 1 << 0;
@@ -170,5 +191,37 @@ contract AccessManagerTest is Test {
         assertFalse(
             accessManager.canCall(delegatee, address(accessManager), selectors[0]), "Role not revoked correctly"
         );
+    }
+
+    function test_AccessManaged_When_Multicall() public {
+        AccessManagedMock accessManagedMock = new AccessManagedMock(accessManager);
+
+        vm.startPrank(owner);
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = accessManagedMock.doSomething.selector;
+        accessManager.grantRoles(delegatee, _ROLE_0 | _ROLE_1);
+        accessManager.grantTargetFunctionRoles(address(accessManagedMock), selectors, _ROLE_0);
+        vm.stopPrank();
+
+        // Normal call (no multicall exists)
+        vm.startPrank(delegatee);
+        accessManagedMock.doSomething();
+        vm.stopPrank();
+
+        MulticallerWithSender multicallerWithSender = MulticallerEtcher.multicallerWithSender(); // Deploy MulticallerWithSender
+
+        // Normal call (multicall exists)
+        vm.startPrank(delegatee);
+        accessManagedMock.doSomething();
+        vm.stopPrank();
+
+        // Through MulticallerWithSender (multicall exists)
+        vm.startPrank(delegatee);
+        address[] memory targets = new address[](1);
+        targets[0] = address(accessManagedMock);
+        bytes[] memory data = new bytes[](1);
+        data[0] = abi.encodeCall(accessManagedMock.doSomething, ());
+        multicallerWithSender.aggregateWithSender(targets, data, new uint256[](1));
+        vm.stopPrank();
     }
 }

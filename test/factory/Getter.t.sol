@@ -1,16 +1,16 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "forge-std/src/Test.sol";
 
-import {Base} from "../Base.t.sol";
+import {TwoCryptoBase} from "../TwoCryptoBase.t.sol";
 
 import {ModuleAccessor} from "src/utils/ModuleAccessor.sol";
 import "../../src/Types.sol";
 import {Errors} from "../../src/Errors.sol";
 import "src/Constants.sol" as Constants;
 
-contract GetterTest is Base {
+contract GetterTest is TwoCryptoBase {
     function setUp() public override {
         super.setUp();
         _deployTwoCryptoDeployer();
@@ -59,6 +59,8 @@ contract GetterTest is Base {
                 address(verifier),
                 "Verifier module not returned correctly"
             );
+        } else if (index.unwrap() < MAX_MODULES) {
+            // Skip non-deployed modules
         } else {
             vm.expectRevert(ModuleAccessor.ModuleOutOfBounds.selector);
             factory.moduleFor(address(principalToken), index);

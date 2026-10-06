@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -6,7 +6,7 @@ import {Brutalizer} from "../Brutalizer.sol";
 
 import {TwoCryptoNGPrecompiles} from "../TwoCryptoNGPrecompiles.sol";
 import {TwoCryptoFactory} from "../TwoCryptoFactory.sol";
-import {ITwoCrypto} from "../shared/ITwoCrypto.sol";
+import {ITwoCrypto} from "../shared/twocrypto/ITwoCrypto.sol";
 import {MockERC20} from "../mocks/MockERC20.sol";
 
 import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";

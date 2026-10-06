@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {FeePcts} from "../Types.sol";
@@ -6,6 +6,8 @@ import {FeePcts} from "../Types.sol";
 library FeePctsLib {
     uint256 private constant FEE_MASK = 0xFFFF; // 16 bits mask
     uint256 private constant SPLIT_RATIO_OFFSET = 0;
+
+    function getReserveFeePctBps(FeePcts self) internal pure returns (uint16) {}
 
     function getSplitPctBps(FeePcts self) internal pure returns (uint16) {
         return uint16(FeePcts.unwrap(self));

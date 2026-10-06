@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -31,7 +31,7 @@ contract ConstantFeeModuleTest is Test {
         // Deploy mock contracts
         mockAccessManager = makeAddr("mockAccessManager");
         mockFactory = new MockFactory(mockAccessManager);
-        mockPrincipalToken = new MockPrincipalToken(mockFactory);
+        mockPrincipalToken = new MockPrincipalToken(address(mockFactory));
         // Deploy the ConstantFeeModule implementation
         feeModuleImplementation = new ConstantFeeModule();
 
@@ -74,6 +74,24 @@ contract ConstantFeeModuleTest is Test {
 
         FeePcts updatedFeePcts = feeModule.getFeePcts();
         assertEq(FeePctsLib.getSplitPctBps(updatedFeePcts), 6000, "Split ratio not updated correctly");
+    }
+
+    function test_UpdateFeeSplitRatioEmitsEvent() public {
+        vm.mockCall(
+            address(mockAccessManager),
+            abi.encodeWithSelector(
+                AccessManager.canCall.selector,
+                address(this),
+                address(feeModule),
+                ConstantFeeModule.updateFeeSplitRatio.selector
+            ),
+            abi.encode(true)
+        );
+
+        vm.expectEmit(true, true, true, true, address(feeModule));
+        emit ConstantFeeModule.FeeSplitRatioUpdated(Constants.DEFAULT_SPLIT_RATIO_BPS, uint16(6000));
+
+        ConstantFeeModule(address(feeModule)).updateFeeSplitRatio(6000);
     }
 
     function test_RevertWhen_UpdateFeeSplitRatioUnauthorized() public {

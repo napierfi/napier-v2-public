@@ -11,11 +11,6 @@ on:
       - "assets/**"
       - "README.md"
 
-env:
-  ETH_RPC_URL: ${{secrets.ETH_RPC_URL}}
-  ETHERSCAN_API_KEY: ${{secrets.ETHERSCAN_API_KEY}}
-  ALCHEMY_KEY: ${{secrets.ALCHEMY_KEY}}
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -24,7 +19,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: stable
+          version: v1.3.6
 
       - name: Clone repo
         uses: actions/checkout@v4
@@ -39,7 +34,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: stable
+          version: v1.3.6
 
       - name: Clone repo
         uses: actions/checkout@v4
@@ -56,7 +51,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate fuzz seed that changes every 3 weeks to avoid burning through RPC allowance
         run: |
@@ -66,10 +61,13 @@ jobs:
       - name: Show Foundry config
         run: forge config
 
-      - name: Run forge tests
-        run: FOUNDRY_PROFILE=ci forge test -vvv --ffi --no-match-test=testFork
-        env:
-          ALCHEMY_KEY: ${{secrets.ALCHEMY_KEY}}
+      - name: Run local unit, fuzz and invariant tests
+        run: >-
+          FOUNDRY_PROFILE=ci forge test --dynamic-test-linking
+          --skip test/integrations test/wrapper/ConvexWrapper.t.sol test/wrapper/SNukeWrapper.t.sol script
+          --no-match-test=testFork
+          --no-match-contract='(Fork|ConvexWrapperTest|^(PYUSDTest|PXETH_STETH_Test|REUSD_SCRVUSD_Test|RSUP_WETH_Test|AggregationRouterTest|RobinhoodStockTokenResolverTest|SNukeWrapperTest|apyUSDWrapperTest|aWETHWrapperTest|AddLiquidityAnyOneTokenTest|ZapCombineToAnyTokenTest|RedeemAnyTokenTest|RemoveLiquidityAnyOneTokenTest|ZapSupplyAnyTokenTest|SwapAnyTokenForPtTest|SwapAnyTokenForYTTest|SwapPtForAnyTokenTest|SwapYtForAnyTokenTest)$)'
+          --threads=2 --show-progress --suppress-successful-traces
 
   codespell:
     name: Run codespell
@@ -84,4 +82,4 @@ jobs:
         with:
           check_filenames: true
           ignore_words_list: amountin
-          skip: ./.git,pnpm-lock.yaml
+          skip: ./.git,pnpm-lock.yaml,*.pdf,node_modules,out,cache

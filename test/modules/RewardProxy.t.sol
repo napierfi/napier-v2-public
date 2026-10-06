@@ -1,47 +1,101 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
-import {PrincipalTokenTest} from "../shared/PrincipalToken.t.sol";
-
-import {LibClone} from "solady/src/utils/LibClone.sol";
+import {Base, TwoCryptoBase} from "../TwoCryptoBase.t.sol";
 import {ERC20} from "solady/src/tokens/ERC20.sol";
+import {LibClone} from "solady/src/utils/LibClone.sol";
+import {Initializable} from "solady/src/utils/Initializable.sol";
 
-import {RewardProxyModule, TokenReward} from "src/modules/RewardProxyModule.sol";
-import {TokenReward} from "src/Types.sol";
+import {RewardProxyModule} from "src/modules/RewardProxyModule.sol";
+import {MockRewardProxyModule} from "../mocks/MockRewardProxy.sol";
+import {MockPrincipalToken} from "../mocks/MockPrincipalToken.sol";
+
+import {Factory} from "src/Factory.sol";
+import {PrincipalToken} from "src/tokens/PrincipalToken.sol";
+import {ConstantFeeModule} from "src/modules/FeeModule.sol";
+import {FeePctsLib} from "src/utils/FeePctsLib.sol";
+
+import "src/Types.sol";
+import "src/Constants.sol";
 import {Errors} from "src/Errors.sol";
 
-contract RewardProxyTest is PrincipalTokenTest {
-    MockSiloDistributionManager distributor;
+abstract contract RewardProxyBaseTest is TwoCryptoBase {
+    address rewardProxy_logic;
 
-    function setUp() public override {
-        // Override rewardProxy implementation
-        mockRewardProxy_logic = address(new MockSiloRewardProxyModule());
-        super.setUp();
+    function setUp() public virtual override {
+        Base.setUp();
 
-        distributor = new MockSiloDistributionManager();
-        address siloAsset = makeAddr("silo_asset");
+        _deployTwoCryptoDeployer();
+        _setUpModules();
+        _deployInstance();
+    }
 
-        // Deploy the rewardProxy module
-        bytes memory customArgs = abi.encode(rewardTokens, distributor, siloAsset);
-        cloneRewardProxy(customArgs);
-        rewardProxy.initialize();
+    function _deployTokens() internal virtual override {
+        super._deployTokens();
+    }
 
-        // Toy data
-        distributor.setRewardToken(rewardTokens[0]);
-        distributor.setReward(address(principalToken), 1000);
+    function _setUpModules() internal override {
+        super._setUpModules();
+
+        vm.startPrank(admin);
+        factory.setModuleImplementation(REWARD_PROXY_MODULE_INDEX, rewardProxy_logic, true);
+        vm.stopPrank();
+    }
+
+    function _deployInstance() internal override {
+        FeePcts feePcts = FeePctsLib.pack(DEFAULT_SPLIT_RATIO_BPS, 0, 100, 0, BASIS_POINTS); // 100% split fee, 0 issuance fee, 1% performance fee, 0 redemption fee
+
+        bytes memory poolArgs = abi.encode(twocryptoParams);
+        bytes memory resolverArgs = abi.encode(address(target)); // Add appropriate resolver args if needed
+        Factory.ModuleParam[] memory moduleParams = new Factory.ModuleParam[](2);
+        moduleParams[0] = Factory.ModuleParam({
+            moduleType: FEE_MODULE_INDEX,
+            implementation: constantFeeModule_logic,
+            immutableData: abi.encode(feePcts)
+        });
+        moduleParams[1] = Factory.ModuleParam({
+            moduleType: REWARD_PROXY_MODULE_INDEX,
+            implementation: rewardProxy_logic,
+            immutableData: getCustomArgs()
+        });
+
+        Factory.Suite memory suite = Factory.Suite({
+            accessManagerImpl: accessManager_logic,
+            resolverBlueprint: resolver_blueprint,
+            ptBlueprint: pt_blueprint,
+            poolDeployerImpl: address(twocryptoDeployer),
+            poolArgs: poolArgs,
+            resolverArgs: resolverArgs
+        });
+        (address _pt, address _yt, address _twocrypto) =
+            factory.deploy({suite: suite, params: moduleParams, expiry: expiry, curator: curator});
+        // Store instances
+        assembly {
+            sstore(principalToken.slot, _pt)
+            sstore(yt.slot, _yt)
+            sstore(twocrypto.slot, _twocrypto)
+        }
+        resolver = principalToken.i_resolver();
+        feeModule = ConstantFeeModule(factory.moduleFor(_pt, FEE_MODULE_INDEX));
+        rewardProxy = MockRewardProxyModule(factory.moduleFor(_pt, REWARD_PROXY_MODULE_INDEX)); // Note: MorphoRewardProxy
+        accessManager = principalToken.i_accessManager();
     }
 
     function cloneRewardProxy(bytes memory customArgs) public {
         bytes memory args = abi.encode(principalToken, customArgs);
-        address instance = LibClone.clone(mockRewardProxy_logic, args);
+        address instance = LibClone.clone(rewardProxy_logic, args);
         assembly {
             sstore(rewardProxy.slot, instance)
         }
     }
 
-    /// @dev RewardProxy.initialize() is view function
-    function test_RevertWhen_Reinitialize() public {}
+    function getCustomArgs() public virtual returns (bytes memory);
+
+    function test_RevertWhen_Reinitialize() public virtual {
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        rewardProxy.initialize();
+    }
 
     function test_RewardTokens() public view {
         assertEq(rewardProxy.rewardTokens().length, rewardTokens.length);
@@ -50,29 +104,20 @@ contract RewardProxyTest is PrincipalTokenTest {
         }
     }
 
-    function test_RevertWhen_RewardTokensEmpty() public {
-        bytes memory customArgs = abi.encode(new address[](0), distributor, makeAddr("silo_asset"));
-        cloneRewardProxy(customArgs);
+    function _test_RevertWhen_RewardTokensEmpty(bytes memory badCustomArgs) internal {
+        cloneRewardProxy(badCustomArgs);
         vm.expectRevert();
         rewardProxy.initialize();
     }
 
-    function test_RevertWhen_DuplicatedRewardTokens() public {
-        address[] memory badRewardTokens = new address[](2);
-        badRewardTokens[0] = rewardTokens[0];
-        badRewardTokens[1] = rewardTokens[0]; // Duplicate reward token address
-        bytes memory customArgs = abi.encode(badRewardTokens, distributor, makeAddr("silo_asset"));
-        cloneRewardProxy(customArgs);
+    function _test_RevertWhen_DuplicatedRewardTokens(bytes memory badCustomArgs) internal {
+        cloneRewardProxy(badCustomArgs);
         vm.expectRevert(Errors.RewardProxy_InconsistentRewardTokens.selector);
         rewardProxy.initialize();
     }
 
-    function test_RevertWhen_BadRewardTokens() public {
-        address[] memory badRewardTokens = new address[](2);
-        badRewardTokens[0] = address(0x02);
-        badRewardTokens[1] = address(0x01); // Descending order
-        bytes memory customArgs = abi.encode(badRewardTokens, distributor, makeAddr("silo_asset"));
-        cloneRewardProxy(customArgs);
+    function _test_RevertWhen_BadRewardTokens(bytes memory badCustomArgs) internal {
+        cloneRewardProxy(badCustomArgs);
         vm.expectRevert(Errors.RewardProxy_InconsistentRewardTokens.selector);
         rewardProxy.initialize();
     }
@@ -94,6 +139,56 @@ contract RewardProxyTest is PrincipalTokenTest {
     function test_Rescue_RevertWhen_Unauthorized() public {
         vm.expectRevert(Errors.AccessManaged_Restricted.selector);
         rewardProxy.rescue(address(rewardTokens[0]), alice, 999);
+    }
+}
+
+contract RewardProxyTest is RewardProxyBaseTest {
+    address siloAsset;
+    MockSiloDistributionManager distributor;
+
+    function setUp() public override {
+        siloAsset = makeAddr("silo_asset");
+        distributor = new MockSiloDistributionManager();
+        mockRewardProxy_logic = address(new MockSiloRewardProxyModule());
+        rewardProxy_logic = mockRewardProxy_logic;
+
+        Base.setUp();
+
+        principalToken = PrincipalToken(address(new MockPrincipalToken(address(factory))));
+
+        // Deploy the rewardProxy module
+        bytes memory customArgs = getCustomArgs();
+        cloneRewardProxy(customArgs);
+        rewardProxy.initialize();
+
+        // Toy data
+        distributor.setRewardToken(rewardTokens[0]);
+        distributor.setReward(address(principalToken), 1000);
+    }
+
+    function getCustomArgs() public view override returns (bytes memory) {
+        return abi.encode(rewardTokens, distributor, siloAsset);
+    }
+
+    function test_RevertWhen_RewardTokensEmpty() public {
+        bytes memory customArgs = abi.encode(new address[](0), distributor, siloAsset);
+        _test_RevertWhen_RewardTokensEmpty(customArgs);
+    }
+
+    function test_RevertWhen_DuplicatedRewardTokens() public {
+        address[] memory badRewardTokens = new address[](2);
+        badRewardTokens[0] = rewardTokens[0];
+        badRewardTokens[1] = rewardTokens[0]; // Duplicate reward token address
+        bytes memory customArgs = abi.encode(badRewardTokens, distributor, siloAsset);
+        _test_RevertWhen_DuplicatedRewardTokens(customArgs);
+    }
+
+    function test_RevertWhen_BadRewardTokens() public {
+        address[] memory badRewardTokens = new address[](2);
+        badRewardTokens[0] = address(0x02);
+        badRewardTokens[1] = address(0x01); // Descending order
+        bytes memory customArgs = abi.encode(badRewardTokens, distributor, siloAsset);
+        _test_RevertWhen_BadRewardTokens(customArgs);
     }
 }
 

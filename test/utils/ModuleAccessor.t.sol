@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -24,6 +24,13 @@ contract ModuleAccessorTest is Test {
         assertEq(m.length, modules.length, "length");
         for (uint256 i = 0; i < modules.length; i++) {
             assertEq(m[i], modules[i], string.concat("member_", vm.toString(i)));
+        }
+    }
+
+    function testFuzz_GetByPointer(address[] memory modules) public {
+        address pointer = SSTORE2.write(abi.encode(modules));
+        for (uint256 i = 0; i < modules.length; i++) {
+            assertEq(ModuleAccessor.get(pointer, ModuleIndex.wrap(i)), modules[i], "get(i)");
         }
     }
 

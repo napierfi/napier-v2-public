@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import {ERC20} from "solady/src/tokens/ERC20.sol";
@@ -24,6 +24,12 @@ function isNotNative(Token x) pure returns (bool result) {
 
 function eq(Token token0, address token1) pure returns (bool result) {
     result = Token.unwrap(token0) == token1;
+}
+
+function asAddressArray(Token[] memory tokens) pure returns (address[] memory result) {
+    assembly {
+        result := tokens
+    }
 }
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

@@ -1,108 +1,56 @@
-## Napier V2
+# Napier V2
+
+Napier V2 is a yield-stripping protocol with Principal Tokens (PT), Yield Tokens (YT), and pluggable liquidity pools. The contract snapshot includes the Uniswap v4 TokiHook AMM and Curve TwoCrypto integration.
 
 ## Documentation
 
-https://book.getfoundry.sh/
+- [Integration guide](./docs/Integration.md): contract boundaries, routing, quoting, and artifact paths.
+- [Release snapshot](./docs/releases/uniswap-v4-port.md): source revision, scope, verification, and licensing review requirements.
 
-![overview](./docs/overview.svg)
+## Toolchain
 
-## Usage
+Use Foundry **v1.3.6**, Node.js 22, and pnpm 9 or 10. The build targets Cancun, including transient storage, and does not use `via_ir`.
 
-### Install
-
-```shell
-pnpm install
+```sh
+pnpm install --frozen-lockfile
+forge build --dynamic-test-linking --skip test --threads 2
+forge fmt --check
 ```
 
-### Build
+## Tests
 
-```shell
-$ forge build
+The public CI selection runs local unit, fuzz, and bounded invariant tests without RPC credentials or FFI:
+
+```sh
+FOUNDRY_PROFILE=ci forge test --dynamic-test-linking \
+  --skip test/integrations test/wrapper/ConvexWrapper.t.sol test/wrapper/SNukeWrapper.t.sol script \
+  --no-match-test=testFork \
+  --no-match-contract='(Fork|ConvexWrapperTest|^(PYUSDTest|PXETH_STETH_Test|REUSD_SCRVUSD_Test|RSUP_WETH_Test|AggregationRouterTest|RobinhoodStockTokenResolverTest|SNukeWrapperTest|apyUSDWrapperTest|aWETHWrapperTest|AddLiquidityAnyOneTokenTest|ZapCombineToAnyTokenTest|RedeemAnyTokenTest|RemoveLiquidityAnyOneTokenTest|ZapSupplyAnyTokenTest|SwapAnyTokenForPtTest|SwapAnyTokenForYTTest|SwapPtForAnyTokenTest|SwapYtForAnyTokenTest)$)' \
+  --threads=2 --show-progress --suppress-successful-traces
 ```
 
-### Test
+RPC-backed integrations, fork fixtures, and live aggregator tests remain in `test/` but are excluded from this credential-free command. Filtering only `testFork` names is insufficient: some fixtures fork in constructors or `setUp`. Set the required RPC variables from `.env.example` locally before selecting a fork suite explicitly, for example:
 
-Set the following environment variables in `.env`:
-
-```shell
-ALCHEMY_KEY=
-ETHERSCAN_API_KEY=
+```sh
+forge test --dynamic-test-linking \
+  --match-path test/integrations/morpho/MEVUSDC.t.sol --threads 2
 ```
 
-```shell
-$ forge test -vvv
-```
+`test/modules/AggregationRouter.t.sol` additionally needs `--ffi`, `bash`, `curl`, `jq`, and external API access. Do not enable FFI for untrusted code or expose credentials to public pull-request workflows.
 
-For running symbolic tests with Halmos:
+## Networks and deployments
 
-```shell
-python3.10 -m venv .venv
-source .venv/bin/activate
-pip install halmos
-```
+Contracts require a Cancun-compatible EVM. TokiHook additionally requires Uniswap v4 PoolManager and Permit2 deployments. The records in `deployments/chains/` are retained historical public records, not a verified address manifest for this contract snapshot. Operational deployment scripts are outside the public port's scope; the build and local tests do not deploy to a live network.
 
-```shell
-halmos --mc=LibRewardProxySymTest
-```
+## Known limitations
 
-### Format
+- Interest or reward income can be frozen by extreme share-price/accounting conditions. Review the rounding and precision constraints in `YieldMathLib`, `RewardMathLib`, and `PrincipalToken` before integrating.
+- TwoCrypto YT routing can revert when Curve's `get_dx`/`get_dy` previews diverge from execution during parameter ramping. A preview is not an execution guarantee.
 
-```shell
-$ forge fmt
-```
+## Audit and licensing status
 
-### Gas Snapshots
+The existing reports in `audits/` are preserved; their presence does not establish audit coverage for this release snapshot.
 
-```shell
-$ forge snapshot
-```
+Napier-authored code follows the `BUSL-1.1` declarations in `release/uniswap-v4`. The root [LICENSE](./LICENSE) contains the canonical Business Source License 1.1 text. Imported Solidity headers and package metadata are preserved exactly; upstream-derived files and fixtures retain their file-specific MIT/GPL/UNLICENSED declarations.
 
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Slither
-
-```
-python3 -m pip install slither-analyzer
-pip install solc-select
-solc-select install 0.8.24
-solc-select use 0.8.24
-```
-
-```shell
-slither . --config-file slither.config.json --checklist --json result.json --skip-assembly > result.md
-```
-
-## Supported Networks
-
-- EVM networks supporting `PUSH0` opcode except for ZkSync Era
-
-## Deployments
-
-All deployments are stored in the [deployments/chains](./deployments/chains) directory.
-
-For generating environment variables for a specific chain and environment, run:
-
-```shell
-./deployments/scripts/get-env.sh <chain> <environment> <output_file>
-```
-
-Example:
-
-```shell
-./deployments/scripts/get-env.sh eth prod .env.generated
-```
-
-## Known Issues
-
-1. The whole interest income for a user may be frozen.
-   See [YieldMathLib.sol](./src/utils/YieldMathLib.sol) and [PrincipalToken#supply](./src/tokens/PrincipalToken.sol) for more details.
-   The issue is similar to [the one](https://github.com/spearbit/portfolio/blob/master/pdfs/Pendle-Spearbit-Security-Review-July-2024.pdf)
-2. The whole rewards income for a user may be frozen.
-   The root cause is the same as interest income freezing.
-
-3. Swap YT for token may revert because the `TwoCrypto.get_dy` is not accurate when the ramping of the pool is not considered.
-   `Zap` ands `Quoter` depend on `get_dx` and `get_dy` functions in `TwoCrypto` for simulating `exchange` function but the ramping of the pool is not considered in the view functions.
+The source revision does not publish the license parameters: Licensor, Additional Use Grant, Change Date, or Change License. These have not been inferred or invented. The canonical license requires these parameters to be specified by the licensor before a complete project-specific license can be published.

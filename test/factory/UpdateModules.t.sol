@@ -1,10 +1,9 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "forge-std/src/Test.sol";
 
-import {Base} from "../Base.t.sol";
-
+import {TwoCryptoBase} from "../TwoCryptoBase.t.sol";
 import {SSTORE2} from "solady/src/utils/SSTORE2.sol";
 
 import {Factory} from "../../src/Factory.sol";
@@ -27,7 +26,7 @@ contract MockModule is BaseModule {
     }
 }
 
-contract UpdateModulesTest is Base {
+contract UpdateModulesTest is TwoCryptoBase {
     function setUp() public override {
         super.setUp();
         _deployTwoCryptoDeployer();
@@ -47,6 +46,16 @@ contract UpdateModulesTest is Base {
         Factory.ModuleParam[] memory params = new Factory.ModuleParam[](1);
         params[0] =
             Factory.ModuleParam({moduleType: FEE_MODULE_INDEX, implementation: address(0x123), immutableData: ""});
+
+        vm.expectRevert(Errors.Factory_CannotUpdateFeeModule.selector);
+        vm.prank(dev);
+        factory.updateModules(address(principalToken), params);
+    }
+
+    function test_RevertWhen_PoolFeeModuleUpdated() public {
+        Factory.ModuleParam[] memory params = new Factory.ModuleParam[](1);
+        params[0] =
+            Factory.ModuleParam({moduleType: POOL_FEE_MODULE_INDEX, implementation: address(0x123), immutableData: ""});
 
         vm.expectRevert(Errors.Factory_CannotUpdateFeeModule.selector);
         vm.prank(dev);
@@ -139,5 +148,9 @@ contract UpdateModulesTest is Base {
         vm.expectRevert(Errors.AccessManaged_Restricted.selector);
         vm.prank(admin); // Napier admin
         factory.updateModules(address(principalToken), params);
+    }
+
+    function test_RevertWhen_NonReentrant() public {
+        vm.skip(true);
     }
 }

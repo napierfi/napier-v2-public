@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -8,6 +8,7 @@ import {LibClone} from "solady/src/utils/LibClone.sol";
 import {EIP5095PropertyPlus} from "./EIP5095.prop.sol";
 import {MockFeeModule} from "../mocks/MockFeeModule.sol";
 import {MockResolver} from "../mocks/MockResolver.sol";
+import {MockFactory} from "../mocks/MockFactory.sol";
 import {MockRewardProxyModule, MockBadRewardProxyModule} from "../mocks/MockRewardProxy.sol";
 import {ModuleAccessor} from "src/utils/ModuleAccessor.sol";
 import {Factory} from "src/Factory.sol";
@@ -26,24 +27,7 @@ abstract contract PrincipalTokenTest is EIP5095PropertyPlus {
     using Casting for *;
 
     address pointer;
-
-    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
-    /*                          Factory                           */
-    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
-
-    function args() external view returns (Factory.ConstructorArg memory) {
-        return Factory.ConstructorArg({
-            expiry: expiry,
-            resolver: address(resolver),
-            yt: address(yt),
-            accessManager: address(accessManager),
-            modules: pointer
-        });
-    }
-
-    function s_treasury() external view returns (address) {
-        return treasury;
-    }
+    MockFactory dummyFactory;
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
     /*                          SetUp                             */
@@ -52,9 +36,12 @@ abstract contract PrincipalTokenTest is EIP5095PropertyPlus {
     function setUp() public virtual override {
         super.setUp();
 
+        dummyFactory = new MockFactory(address(napierAccessManager));
+
         bytes32 salt = keccak256("salt");
-        principalToken =
-            PrincipalToken(vm.computeCreate2Address(salt, keccak256(type(PrincipalToken).creationCode), address(this)));
+        principalToken = PrincipalToken(
+            vm.computeCreate2Address(salt, keccak256(type(PrincipalToken).creationCode), address(dummyFactory))
+        );
         resolver = new MockResolver(address(target));
         feeModule = new MockFeeModule();
         bytes memory immutableArgs = abi.encode(rewardTokens, multiRewardDistributor);
@@ -73,7 +60,18 @@ abstract contract PrincipalTokenTest is EIP5095PropertyPlus {
         deployCodeTo("src/modules/AccessManager.sol:AccessManager", address(accessManager));
         accessManager.initializeOwner(curator);
         yt = YieldToken(deployCode("src/tokens/YieldToken.sol", abi.encode(principalToken)));
-        PrincipalToken instance = new PrincipalToken{salt: salt}();
+
+        dummyFactory.setArgs(
+            Factory.ConstructorArg({
+                expiry: expiry,
+                resolver: address(resolver),
+                yt: address(yt),
+                accessManager: address(accessManager),
+                modules: pointer
+            })
+        );
+        dummyFactory.setTreasury(treasury);
+        PrincipalToken instance = PrincipalToken(dummyFactory.deploy(type(PrincipalToken).creationCode, salt));
         require(instance == principalToken, "Setup failed to deploy PrincipalToken correctly");
 
         _label();
@@ -97,4 +95,7 @@ abstract contract PrincipalTokenTest is EIP5095PropertyPlus {
         vm.prank(address(principalToken.i_factory()));
         principalToken.setModules(p);
     }
+
+    function _deployInstance() internal virtual override {}
+    function _registerPoolDeployer() internal virtual override {}
 }

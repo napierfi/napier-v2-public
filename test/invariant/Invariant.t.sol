@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.13;
 
 import "forge-std/src/Test.sol";
 import "../Property.sol" as Property;
 
-import {Base} from "../Base.t.sol";
+import {TwoCryptoBase} from "../TwoCryptoBase.t.sol";
 import {BaseHandler} from "./handler/BaseHandler.sol";
 import {PrincipalTokenHandler} from "./handler/PrincipalTokenHandler.sol";
 import {Ghost} from "./Ghost.sol";
@@ -24,7 +24,7 @@ import {YieldToken} from "src/tokens/YieldToken.sol";
 /// @dev Known error on invariant testing:
 /// 1. `ValueIsZeroSentinel()` on YT receivers ghost variable update because Solady's `EnumerableSetLib` does not allow special value `_ZERO_SENTINEL` as a member.
 /// 2. Hook actor fails to make a call on hook
-contract InvariantTest is Base {
+contract InvariantTest is TwoCryptoBase {
     uint256 constant N_HOOK_ACTORS = 8;
     Ghost s_ghost;
     PrincipalTokenHandler s_principalTokenHandler;

@@ -1,5 +1,5 @@
 {
-  "name": "napier-v2-public",
+  "name": "napier-v2",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,11 +8,22 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "BUSL-1.1",
   "dependencies": {
     "@openzeppelin/contracts": "v5.0.2",
-    "forge-std": "github:foundry-rs/forge-std#v1.9.2",
+    "@uniswap/permit2": "github:Uniswap/permit2",
+    "@uniswap/universal-router": "github:Uniswap/universal-router#3663f6db6e2fe121753cd2d899699c2dc75dca86",
+    "@uniswap/v4-core": "github:Uniswap/v4-core#d9f8bfd39070b6114f2cf6c49df570fd6f998edb",
+    "@uniswap/v4-periphery": "github:Uniswap/v4-periphery#9628c36b4f5083d19606e63224e4041fe748edae",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.7",
     "halmos-cheatcodes": "github:a16z/halmos-cheatcodes",
-    "solady": "0.1.0"
+    "multicaller": "github:Vectorized/multicaller",
+    "solady": "0.1.0",
+    "solmate": "^6.8.0"
+  },
+  "devDependencies": {
+    "@pythnetwork/pyth-sdk-solidity": "^4.3.1",
+    "dotenv": "^16.4.7",
+    "viem": "^2.23.10"
   }
 }

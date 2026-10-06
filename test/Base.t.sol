@@ -1,16 +1,14 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {Vm, console2} from "forge-std/src/Test.sol";
 import {Helpers} from "./shared/Helpers.sol";
 import {TestPlus} from "./shared/TestPlus.sol";
 
-import {TwoCryptoNGPrecompiles} from "./TwoCryptoNGPrecompiles.sol";
-import {TwoCryptoFactory} from "./TwoCryptoFactory.sol";
-
 import {ERC20} from "solady/src/tokens/ERC20.sol";
 import {ERC4626} from "solady/src/tokens/ERC4626.sol";
 import {LibClone} from "solady/src/utils/LibClone.sol";
+
 // Mocks
 import {MockWETH} from "./mocks/MockWETH.sol";
 import {MockERC20} from "./mocks/MockERC20.sol";
@@ -28,16 +26,14 @@ import {AccessManager} from "src/modules/AccessManager.sol";
 import {RewardProxyModule} from "src/modules/RewardProxyModule.sol";
 import {DepositCapVerifierModule} from "src/modules/VerifierModule.sol";
 import {FeeModule, ConstantFeeModule} from "src/modules/FeeModule.sol";
+import {PoolFeeModule} from "src/modules/PoolFeeModule.sol";
 import {VaultInfoResolver} from "src/modules/resolvers/VaultInfoResolver.sol";
 import {ERC4626InfoResolver} from "src/modules/resolvers/ERC4626InfoResolver.sol";
-import {TwoCryptoDeployer} from "src/modules/deployers/TwoCryptoDeployer.sol";
 
 // Contracts
 import {Factory} from "src/Factory.sol";
 import {PrincipalToken} from "src/tokens/PrincipalToken.sol";
 import {YieldToken} from "src/tokens/YieldToken.sol";
-import {TwoCryptoZap} from "src/zap/TwoCryptoZap.sol";
-import {Quoter} from "src/lens/Quoter.sol";
 import {DefaultConnectorFactory} from "src/modules/connectors/DefaultConnectorFactory.sol";
 import {VaultConnectorRegistry} from "src/modules/connectors/VaultConnectorRegistry.sol";
 import {AggregationRouter} from "src/modules/aggregator/AggregationRouter.sol";
@@ -75,6 +71,7 @@ abstract contract Base is TestPlus, Helpers {
     address mockRewardProxy_logic = address(new MockRewardProxyModule());
     address constantFeeModule_logic = address(new ConstantFeeModule());
     address verifierModule_logic = address(new DepositCapVerifierModule());
+    address poolFeeModule_logic = address(new PoolFeeModule());
     // Blueprint
     address pt_blueprint = LibBlueprint.deployBlueprint(type(PrincipalToken).creationCode);
     address yt_blueprint = LibBlueprint.deployBlueprint(type(YieldToken).creationCode);
@@ -95,21 +92,12 @@ abstract contract Base is TestPlus, Helpers {
     MockMultiRewardDistributor multiRewardDistributor;
     PrincipalToken principalToken;
     YieldToken yt;
-    TwoCrypto twocrypto;
-    TwoCryptoDeployer twocryptoDeployer;
+
+    // Pool-agnostic reference (use appropriate wrapper/type in subclasses)
+    address pool;
+
     // Params
     uint256 expiry;
-    TwoCryptoNGParams twocryptoParams = TwoCryptoNGParams({
-        A: 40000000, // 0 unit
-        gamma: 0.019 * 1e18, // 1e18 unit
-        mid_fee: 0.0006 * 1e8, // 1e8 unit
-        out_fee: 0.006 * 1e8, // 1e8 unit
-        fee_gamma: 0.07 * 1e18, // 1e18 unit
-        allowed_extra_profit: 2e-6 * 1e18, // 1e18 unit
-        adjustment_step: 0.00049 * 1e18, // 1e18 unit
-        ma_time: 3600, // 0 unit
-        initial_price: 0.7e18 // price of the coins[1] against the coins[0] (1e18 unit)
-    });
 
     uint256 tOne;
     uint256 bOne;
@@ -160,10 +148,9 @@ abstract contract Base is TestPlus, Helpers {
         vm.label(address(resolver), "resolver");
         vm.label(address(target), "target");
         vm.label(address(base), "base");
-        vm.label(address(twocryptoDeployer), "twocryptoDeployer");
         vm.label(address(yt), "yt");
         vm.label(address(principalToken), "principalToken");
-        vm.label(twocrypto.unwrap(), "twocrypto");
+        vm.label(address(pool), "pool");
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             vm.label(rewardTokens[i], string.concat("rewardToken", vm.toString(i)));
         }
@@ -173,48 +160,7 @@ abstract contract Base is TestPlus, Helpers {
     }
 
     /// @notice Deploy the instance of PrincipalToken, YT and Pool.
-    function _deployInstance() internal virtual {
-        FeePcts feePcts = FeePctsLib.pack(Constants.DEFAULT_SPLIT_RATIO_BPS, 0, 100, 0, BASIS_POINTS); // 100% split fee, 0 issuance fee, 1% performance fee, 0 redemption fee
-
-        bytes memory poolArgs = abi.encode(twocryptoParams);
-        bytes memory resolverArgs = abi.encode(address(target)); // Add appropriate resolver args if needed
-        Factory.ModuleParam[] memory moduleParams = new Factory.ModuleParam[](3);
-        moduleParams[0] = Factory.ModuleParam({
-            moduleType: FEE_MODULE_INDEX,
-            implementation: constantFeeModule_logic,
-            immutableData: abi.encode(feePcts)
-        });
-        moduleParams[1] = Factory.ModuleParam({
-            moduleType: VERIFIER_MODULE_INDEX,
-            implementation: verifierModule_logic,
-            immutableData: abi.encode(type(uint256).max) // No cap
-        });
-        moduleParams[2] = Factory.ModuleParam({
-            moduleType: REWARD_PROXY_MODULE_INDEX,
-            implementation: mockRewardProxy_logic,
-            immutableData: abi.encode(rewardTokens, multiRewardDistributor)
-        });
-
-        Factory.Suite memory suite = Factory.Suite({
-            accessManagerImpl: address(accessManager_logic),
-            resolverBlueprint: address(resolver_blueprint),
-            ptBlueprint: address(pt_blueprint),
-            poolDeployerImpl: address(twocryptoDeployer),
-            poolArgs: poolArgs,
-            resolverArgs: resolverArgs
-        });
-        (address _pt, address _yt, address _twocrypto) =
-            factory.deploy({suite: suite, params: moduleParams, expiry: expiry, curator: curator});
-        // Store instances
-        principalToken = PrincipalToken(_pt);
-        yt = YieldToken(_yt);
-        twocrypto = TwoCrypto.wrap(_twocrypto);
-        resolver = principalToken.i_resolver();
-        feeModule = ConstantFeeModule(factory.moduleFor(_pt, FEE_MODULE_INDEX));
-        verifier = DepositCapVerifierModule(factory.moduleFor(_pt, VERIFIER_MODULE_INDEX));
-        rewardProxy = MockRewardProxyModule(factory.moduleFor(_pt, REWARD_PROXY_MODULE_INDEX));
-        accessManager = principalToken.i_accessManager();
-    }
+    function _deployInstance() internal virtual;
 
     function _setUpModules() internal virtual {
         vm.startPrank(admin);
@@ -236,29 +182,26 @@ abstract contract Base is TestPlus, Helpers {
         factory.setModuleImplementation(FEE_MODULE_INDEX, address(constantFeeModule_logic), true);
         factory.setModuleImplementation(VERIFIER_MODULE_INDEX, address(verifierModule_logic), true);
         factory.setModuleImplementation(REWARD_PROXY_MODULE_INDEX, address(mockRewardProxy_logic), true);
-        factory.setPoolDeployer(address(twocryptoDeployer), true);
+        factory.setModuleImplementation(POOL_FEE_MODULE_INDEX, address(poolFeeModule_logic), true);
+        // Subclasses need to implement specific pool deployer registration
+        _registerPoolDeployer();
         vm.stopPrank();
     }
 
-    function _deployTwoCryptoDeployer() internal {
-        address math = TwoCryptoNGPrecompiles.deployMath();
-        address views = TwoCryptoNGPrecompiles.deployViews();
-        address amm = TwoCryptoNGPrecompiles.deployBlueprint();
+    function _registerPoolDeployer() internal virtual;
 
-        vm.startPrank(curveAdmin, curveAdmin);
-        twoCryptoFactory = TwoCryptoNGPrecompiles.deployFactory();
-
-        vm.label(math, "twocrypto_math");
-        vm.label(views, "twocrypto_views");
-        vm.label(amm, "twocrypto_blueprint");
-
-        TwoCryptoFactory(twoCryptoFactory).initialise_ownership(curveAdmin, curveAdmin);
-        TwoCryptoFactory(twoCryptoFactory).set_pool_implementation(amm, 0);
-        TwoCryptoFactory(twoCryptoFactory).set_views_implementation(views);
-        TwoCryptoFactory(twoCryptoFactory).set_math_implementation(math);
+    function _grantRoles(
+        AccessManager acm,
+        address caller,
+        address account,
+        address callee,
+        bytes4[] memory selectors,
+        uint256 roles
+    ) internal {
+        vm.startPrank(caller);
+        acm.grantRoles(account, roles);
+        acm.grantTargetFunctionRoles(callee, selectors, roles);
         vm.stopPrank();
-
-        twocryptoDeployer = new TwoCryptoDeployer(twoCryptoFactory);
     }
 
     function _grantRoles(address account, address callee, bytes4[] memory selectors, uint256 roles) internal {
@@ -290,13 +233,12 @@ abstract contract Base is TestPlus, Helpers {
     }
 }
 
+// Generic Zap Base Class
 abstract contract ZapBase is Base {
     MockWETH weth;
-    TwoCryptoZap zap;
     VaultConnectorRegistry connectorRegistry;
     DefaultConnectorFactory defaultConnectorFactory;
     AggregationRouter aggregationRouter;
-    Quoter quoter;
 
     function _deployPeriphery() internal virtual {
         defaultConnectorFactory = new DefaultConnectorFactory(address(weth));
@@ -305,15 +247,6 @@ abstract contract ZapBase is Base {
         initialRouters[0] = ONE_INCH_ROUTER;
         initialRouters[1] = OPEN_OCEAN_ROUTER;
         aggregationRouter = new AggregationRouter(napierAccessManager, initialRouters);
-        zap = new TwoCryptoZap(factory, connectorRegistry, address(twocryptoDeployer), aggregationRouter);
-
-        _deployQuoter();
-    }
-
-    function _deployQuoter() internal {
-        Quoter implementation = new Quoter();
-        quoter = Quoter(LibClone.deployERC1967(address(implementation)));
-        quoter.initialize(factory, connectorRegistry, address(twocryptoDeployer), address(weth), admin);
     }
 
     function _deployWETHVault() internal {
@@ -327,19 +260,10 @@ abstract contract ZapBase is Base {
     function _label() internal virtual override {
         super._label();
         vm.label(address(weth), "weth");
-        vm.label(address(zap), "zap");
         vm.label(address(connectorRegistry), "registry");
         vm.label(address(defaultConnectorFactory), "defaultConnectorFactory");
-        vm.label(address(quoter), "quoter");
+        vm.label(address(aggregationRouter), "aggregationRouter");
         vm.label(ONE_INCH_ROUTER, "1inch-v6");
         vm.label(OPEN_OCEAN_ROUTER, "openOcean");
-    }
-
-    function assertNoFundLeft() internal view {
-        assertEq(address(zap).balance, 0, "ETH left in zap");
-        assertEq(base.balanceOf(address(zap)), 0, "Base left in zap");
-        assertEq(target.balanceOf(address(zap)), 0, "Target left in zap");
-        assertEq(principalToken.balanceOf(address(zap)), 0, "PT left in zap");
-        assertEq(yt.balanceOf(address(zap)), 0, "YT left in zap");
     }
 }

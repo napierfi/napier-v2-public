@@ -1,12 +1,13 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {OwnableRoles} from "solady/src/auth/OwnableRoles.sol";
 import {Initializable} from "solady/src/utils/Initializable.sol";
 import {Multicallable} from "solady/src/utils/Multicallable.sol";
 
-import "../Constants.sol" as Constants;
-import {Errors} from "../Errors.sol";
+import {LibMulticaller} from "multicaller/src/LibMulticaller.sol";
+
+import {LibAccessGuard} from "../utils/LibAccessGuard.sol";
 
 /// @notice Access Manager module for managing single owner and multiple roles for multiple contracts and functions.
 /// @dev Each PrincipalToken instance will have its own AccessManager instance to manage access control.
@@ -120,18 +121,16 @@ abstract contract AccessManaged {
     function i_accessManager() public view virtual returns (AccessManager);
 
     modifier restricted() {
-        _checkRestricted(i_accessManager());
+        LibAccessGuard.checkRestricted(i_accessManager());
         _;
     }
 
     modifier restrictedBy(AccessManager accessManager) {
-        _checkRestricted(accessManager);
+        LibAccessGuard.checkRestricted(accessManager);
         _;
     }
 
     function _checkRestricted(AccessManager accessManager) internal view {
-        if (!accessManager.canCall(msg.sender, address(this), bytes4(msg.data[0:4]))) {
-            revert Errors.AccessManaged_Restricted();
-        }
+        LibAccessGuard.checkRestricted(accessManager);
     }
 }

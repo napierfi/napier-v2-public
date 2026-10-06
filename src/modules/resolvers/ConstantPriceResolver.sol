@@ -1,10 +1,9 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import {ERC20} from "solady/src/tokens/ERC20.sol";
 import {VaultInfoResolver} from "./VaultInfoResolver.sol";
 import {Errors} from "../../Errors.sol";
-import {ERC4626} from "solady/src/tokens/ERC4626.sol";
 
 /**
  * @title ConstantPriceResolver

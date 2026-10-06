@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
-import {IntegrationTest} from "../Integration.t.sol";
+import {TwoCryptoIntegrationTest} from "../TwoCryptoIntegration.t.sol";
 
 import {Factory} from "src/Factory.sol";
 
@@ -9,7 +9,7 @@ import {FeePctsLib} from "src/utils/FeePctsLib.sol";
 import "src/Types.sol";
 import "src/Constants.sol" as Constants;
 
-contract USRForkTest is IntegrationTest {
+contract USRForkTest is TwoCryptoIntegrationTest {
     address constant USR = 0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110;
 
     constructor() {

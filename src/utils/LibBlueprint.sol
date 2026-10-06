@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {LibBytes} from "solady/src/utils/LibBytes.sol";
@@ -116,7 +116,7 @@ library LibBlueprint {
         if (deployed == address(0)) revert DeploymentFailed();
     }
 
-    function extractCreationCode(address _blueprint) private view returns (bytes memory initcode) {
+    function extractCreationCode(address _blueprint) internal view returns (bytes memory initcode) {
         uint256 size;
         uint256 offset = 3; // Skip first 3 bytes
 
@@ -136,6 +136,15 @@ library LibBlueprint {
         assembly {
             extcodecopy(_blueprint, add(initcode, 32), offset, initcodeSize)
         }
+    }
+
+    function computeCreate2Address(bytes32 salt, address _blueprint, address deployer)
+        internal
+        view
+        returns (address)
+    {
+        bytes32 bytecodeHash = keccak256(extractCreationCode(_blueprint));
+        return computeCreeate2Address(salt, bytecodeHash, deployer);
     }
 
     function computeCreate2Address(bytes32 salt, address _blueprint, bytes memory args)

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -155,7 +155,7 @@ contract WithdrawPostSettlement_MaximumPerformanceFee_AccruralTest is PrincipalT
 }
 
 contract PreviewWithdrawTest is PrincipalTokenTest {
-    function testFuzz_Preview(Init memory init, uint256 shares, uint64 timeJump, FeePcts newFeePcts)
+    function testFuzz_Preview(Init memory init, uint256 shares, uint32 timeJump, FeePcts newFeePcts)
         public
         boundInit(init)
     {
