@@ -1,41 +1,49 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {LibClone} from "solady/src/utils/LibClone.sol";
 
 import {VaultConnectorRegistry} from "../modules/connectors/VaultConnectorRegistry.sol";
-import {StandardERC4626Wrapper} from "./StandardERC4626Wrapper.sol";
-import {ERC4626WrapperConnector} from "../modules/connectors/ERC4626WrapperConnector.sol";
+import {IWrapper} from "./IWrapper.sol";
+import {WrapperConnector} from "../modules/connectors/WrapperConnector.sol";
 
 import "../Errors.sol";
 import {AccessManager, AccessManaged} from "../modules/AccessManager.sol";
 
 /// @title WrapperFactory
-/// @notice Factory for creating Napier ERC4626 wrappers and connectors
+/// @notice Factory for creating Napier wrappers and connectors
+/// @dev Access to `VaultConnectorRegistry.setConnector()` must be granted to this contract by the `AccessManager`
 contract WrapperFactory is AccessManaged {
     address private immutable _i_accessManager;
-    address private immutable _i_weth;
+    address public immutable i_weth;
 
     /// @notice The registry of vault connectors
     VaultConnectorRegistry public s_vaultConnectorRegistry;
 
-    /// @notice The implementation of connector for standard ERC4626 wrapper
+    /// @notice The implementation of connector for wrapper
     address public s_connectorImplementation;
 
-    /// @notice ERC4626 Wrapper implementation => valid
-    mapping(address implementation => bool valid) public s_implementations;
+    /// @notice The implementation of wrapper
+    mapping(address implementation => bool valid) public s_wrapperImplementations;
 
-    /// @notice ERC4626 Wrapper instance => implementation
+    /// @notice Wrapper instance => implementation
     mapping(address wrapper => address implementation) public s_wrappers;
 
     event SetWrapperImplementation(address indexed implementation, bool valid);
     event SetConnectorImplementation(address indexed implementation);
+    event SetVaultConnectorRegistry(address indexed oldRegistry, address indexed newRegistry);
     event WrapperCreated(address indexed wrapper, address indexed connector);
 
-    constructor(address accessManager, address weth, address vaultConnectorRegistry) {
+    constructor(address accessManager, address weth, address vaultConnectorRegistry, address connectorImplementation) {
         _i_accessManager = accessManager;
-        _i_weth = weth;
+        i_weth = weth;
         s_vaultConnectorRegistry = VaultConnectorRegistry(vaultConnectorRegistry);
+        s_connectorImplementation = connectorImplementation;
+    }
+
+    function setWrapperImplementation(address implementation, bool valid) external restricted {
+        s_wrapperImplementations[implementation] = valid;
+        emit SetWrapperImplementation(implementation, valid);
     }
 
     function setConnectorImplementation(address implementation) external restricted {
@@ -43,36 +51,41 @@ contract WrapperFactory is AccessManaged {
         emit SetConnectorImplementation(implementation);
     }
 
-    function setWrapperImplementation(address implementation, bool valid) external restricted {
-        s_implementations[implementation] = valid;
-        emit SetWrapperImplementation(implementation, valid);
-    }
-
     function setVaultConnectorRegistry(address _vaultConnectorRegistry) external restricted {
+        address oldRegistry = address(s_vaultConnectorRegistry);
         s_vaultConnectorRegistry = VaultConnectorRegistry(_vaultConnectorRegistry);
+        emit SetVaultConnectorRegistry(oldRegistry, _vaultConnectorRegistry);
     }
 
     /// @notice Create a new ERC4626 Wrapper and connector
-    /// @dev Access to this function must be granted to the caller by the `AccessManager`
-    /// @dev Access to `VaultConnectorRegistry.setConnector()` must be granted to this contract by the `AccessManager`
     /// @param wrapperImplementation The implementation to use for the wrapper
     /// @param args The immutable args for the wrapper
+    /// @param salt The CREATE2 salt for the wrapper and connector deployment
+    /// Note: Vulnerable to front-running salt. Integrators should hash sender into salt to prevent griefing via frontrunning.
     /// @return The address of the new wrapper
-    function createWrapper(address wrapperImplementation, bytes memory args) external restricted returns (address) {
-        if (!s_implementations[wrapperImplementation]) revert Errors.WrapperFactory_ImplementationNotSet();
+    function createWrapper(address wrapperImplementation, bytes calldata args, bytes32 salt)
+        external
+        returns (address)
+    {
+        if (!s_wrapperImplementations[wrapperImplementation]) {
+            revert Errors.WrapperFactory_InvalidWrapperImplementation();
+        }
 
-        address wrapper = LibClone.clone({implementation: wrapperImplementation, args: args});
-        StandardERC4626Wrapper(wrapper).initialize();
+        address wrapper = LibClone.cloneDeterministic({implementation: wrapperImplementation, args: args, salt: salt});
+        IWrapper(wrapper).initialize();
 
-        address connector =
-            LibClone.clone({implementation: s_connectorImplementation, args: abi.encode(wrapper, _i_weth)});
+        address connector = LibClone.cloneDeterministic({
+            implementation: s_connectorImplementation,
+            args: abi.encode(wrapper, i_weth),
+            salt: salt
+        });
 
         s_wrappers[wrapper] = wrapperImplementation;
 
         s_vaultConnectorRegistry.setConnector({
             target: wrapper,
-            asset: StandardERC4626Wrapper(wrapper).asset(),
-            connector: ERC4626WrapperConnector(connector)
+            asset: IWrapper(wrapper).asset(),
+            connector: WrapperConnector(payable(connector))
         });
 
         emit WrapperCreated(wrapper, connector);

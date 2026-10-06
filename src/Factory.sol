@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import {SSTORE2} from "solady/src/utils/SSTORE2.sol";
 import {LibClone} from "solady/src/utils/LibClone.sol";
 import {LibTransient} from "solady/src/utils/LibTransient.sol";
-import {UUPSUpgradeable} from "solady/src/utils/UUPSUpgradeable.sol";
 import {EfficientHashLib} from "solady/src/utils/EfficientHashLib.sol";
+import {UUPSUpgradeable} from "solady/src/utils/UUPSUpgradeable.sol";
+import {ReentrancyGuardTransient} from "solady/src/utils/ReentrancyGuardTransient.sol";
 // Interfaces
 import "./Types.sol";
 import {IPoolDeployer} from "./interfaces/IPoolDeployer.sol";
@@ -25,7 +26,7 @@ import "src/Constants.sol" as Constants;
 ///  - Factory is responsible for deploying PrincipalToken, YT and Pool instances.
 ///  - Factory is agnostic to type of AMM by supporting multiple pool deployers implementations.
 ///  - Factory supports multiple principalToken implementations.
-contract Factory is AccessManaged, UUPSUpgradeable {
+contract Factory is AccessManaged, UUPSUpgradeable, ReentrancyGuardTransient {
     /// @notice EIP1967 proxy immutable arguments offset
     uint256 constant ARGS_ON_ERC1967_FACTORY_ARG_OFFSET = 0x00;
 
@@ -102,6 +103,27 @@ contract Factory is AccessManaged, UUPSUpgradeable {
     /// @param curator Address of the curator. If the address is zero, no one can control the PrincipalToken instance.
     function deploy(Suite calldata suite, ModuleParam[] calldata params, uint256 expiry, address curator)
         external
+        nonReentrant
+        returns (address, address, address)
+    {
+        return _deploy(suite, params, expiry, curator, bytes32(0));
+    }
+
+    /// @dev Deploy using CREATE2 but with a user-provided salt.
+    /// @dev WARNING: The deployment can be frontrun and DOSed.
+    function deployDeterministic(
+        Suite calldata suite,
+        ModuleParam[] calldata params,
+        uint256 expiry,
+        address curator,
+        bytes32 salt
+    ) external nonReentrant returns (address, address, address) {
+        return _deploy(suite, params, expiry, curator, salt);
+    }
+
+    /// @param salt Optional user-provided salt. The user-provided salt must be re-hashed to avoid intentional collision.
+    function _deploy(Suite calldata suite, ModuleParam[] calldata params, uint256 expiry, address curator, bytes32 salt)
+        internal
         returns (address pt, address yt, address pool)
     {
         if (
@@ -117,8 +139,16 @@ contract Factory is AccessManaged, UUPSUpgradeable {
         address accessManager = LibClone.clone(suite.accessManagerImpl);
         AccessManager(accessManager).initializeOwner(curator);
 
-        bytes32 salt =
-            EfficientHashLib.hash(block.chainid, expiry, uint256(uint160(resolver)), uint256(uint160(msg.sender)));
+        // Switch salt calculation for true deterministic deployment
+        // If the salt is not provided, use the default way.
+        if (salt == bytes32(0)) {
+            // Default salt calculation left for compatibility.
+            salt =
+                EfficientHashLib.hash(block.chainid, expiry, uint256(uint160(resolver)), uint256(uint160(msg.sender)));
+        } else {
+            // Re-hash the user-provided salt to avoid using the same salt of the above salt.
+            salt = EfficientHashLib.hash(block.chainid, uint256(uint160(msg.sender)), uint256(salt));
+        }
         pt = LibBlueprint.computeCreate2Address(salt, suite.ptBlueprint, "");
 
         // Stack too deep workaround
@@ -150,12 +180,16 @@ contract Factory is AccessManaged, UUPSUpgradeable {
     /// @dev Revert if the module implementation is not registered.
     function updateModules(address pt, ModuleParam[] calldata params)
         external
+        nonReentrant
         exists(pt)
         restrictedBy(PrincipalToken(pt).i_accessManager())
     {
         // Check if any of the params is trying to update the fee module
         for (uint256 i = 0; i != params.length;) {
+            // FeeModule can not be updated
             if (params[i].moduleType == FEE_MODULE_INDEX) revert Errors.Factory_CannotUpdateFeeModule();
+            // PoolFeeModule can not be updated
+            if (params[i].moduleType == POOL_FEE_MODULE_INDEX) revert Errors.Factory_CannotUpdateFeeModule();
             unchecked {
                 ++i;
             }
@@ -192,6 +226,7 @@ contract Factory is AccessManaged, UUPSUpgradeable {
             }
         }
         // CHECK: FeeModule is mandatory
+        // PoolFeeModule is optional
         if (ModuleAccessor.get(modules, FEE_MODULE_INDEX) == address(0)) {
             revert Errors.Factory_FeeModuleRequired();
         }

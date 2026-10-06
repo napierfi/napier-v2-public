@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "./Types.sol";
@@ -31,6 +31,53 @@ library Events {
     /// @dev `keccak256(bytes("SetApprovalCollector(address,address,bool)"))`.
     uint256 constant _SET_APPROVAL_COLLECTOR_EVENT_SIGNATURE =
         0xa3b5109b351b1b1c9b05310b3176941fadf2a0c23d9bd59f5107f23d888202af;
+
+    /// @dev `keccak256(bytes("PoolDeployed(bytes32,address)"))`.
+    uint256 constant _POOL_DEPLOYED_EVENT_SIGNATURE = 0xa6f3164cc3efa3e13ab66081621e46224da3813cce61ce66147020f0bbd7fdaf;
+
+    /// @dev `keccak256(bytes("HookAddLiquidity(bytes32,address,address,uint256,uint256,uint256)"))`.
+    uint256 constant _HOOK_ADD_LIQUIDITY_EVENT_SIGNATURE =
+        0x129695e0041d12e6a921be4ad35534049bd3f4d370ac4ad28b617715f8623e1d;
+
+    /// @dev `keccak256(bytes("HookRemoveLiquidity(bytes32,address,address,uint256,uint256,uint256)"))`.
+    uint256 constant _HOOK_REMOVE_LIQUIDITY_EVENT_SIGNATURE =
+        0xabf5464acd1de506f3ad11d4c5289fc4abc432151ac6497640ff8b7cfea51e77;
+
+    /// @dev `keccak256(bytes("HookSwap(bytes32,address,int128,int128,uint128,uint128)"))`.
+    uint256 constant _HOOK_SWAP_EVENT_SIGNATURE = 0x365f10e9e7ce45d7acfd986c42e0b666f8af282e440e6dafc78c1f2b2f786760;
+
+    /// @dev `keccak256(bytes("HookFeesAccrued(bytes32,uint128,uint128)"))`.
+    uint256 constant _HOOK_FEES_ACCRUED_EVENT_SIGNATURE =
+        0x19526a89b30aef462dbdce42686efe3cd64e104db5f591b9dd1da813ca99c9fe;
+
+    /// @dev `keccak256(bytes("HookCollectCuratorFeeCollected(bytes32,address,uint256)"))`.
+    uint256 constant _HOOK_COLLECT_CURATOR_FEE_COLLECTED_EVENT_SIGNATURE =
+        0xba368fce0831712e78de5577dcf8614b22e16d5bf15b638a58972cdf77313bbf;
+
+    /// @dev `keccak256(bytes("HookProtocolFeeCollected(bytes32,address,uint256)"))`.
+    uint256 constant _HOOK_COLLECT_PROTOCOL_FEE_COLLECTED_EVENT_SIGNATURE =
+        0x550aa00be1277de060db918695ab2bbe35517c8ac8d3fe5629ceb436947b3423;
+
+    /// @dev `keccak256(bytes("VaultRatiosUpdated(bytes32,uint256,uint16,uint16,uint16)"))`.
+    uint256 constant _VAULT_RATIOS_UPDATED_EVENT_SIGNATURE =
+        0x4e509d2674a20ffa80052f8db3e9d934c2a2aa0d77786375d726a6be2de3eeb7;
+
+    /// @dev `keccak256(bytes("VaultUpdated(bytes32,uint256,address,address)"))`.
+    uint256 constant _VAULT_UPDATED_EVENT_SIGNATURE = 0x16806f16a3efd26cbff9ccb791a4a295444f0cf163ecd7d92ef1525dde94e21e;
+
+    /// @dev `keccak256(bytes("VaultRatiosFrozen(bytes32,uint256)"))`.
+    uint256 constant _VAULT_RATIOS_FROZEN_EVENT_SIGNATURE =
+        0x839402c47a7574de661ba9cc0c997d8446bf50c7f95d2b1788750c1ca12e8393;
+
+    /// @dev `keccak256(bytes("VaultFrozen(bytes32,uint256)"))`.
+    uint256 constant _VAULT_FROZEN_EVENT_SIGNATURE = 0x860b30c60965a41a140560dc7268e361d8f83389d862485eb259b177f6bed7c9;
+
+    /// @dev `keccak256(bytes("VaultDeposit(bytes32,uint256,address,uint256,uint256)"))`.
+    uint256 constant _VAULT_DEPOSIT_EVENT_SIGNATURE = 0x25aba5b1d9940b4c26eba520bb929c23b760e77974dc3a075781eaacb0b32bf3;
+
+    /// @dev `keccak256(bytes("VaultWithdraw(bytes32,uint256,address,uint8,uint256,uint256)"))`.
+    uint256 constant _VAULT_WITHDRAW_EVENT_SIGNATURE =
+        0x5416ec82ef9e07937a8e96cc680f053323cff4a4068a2a40259f34b542035564;
 
     // Deployment events
     event Deployed(address indexed pt, address indexed yt, address indexed pool, uint256 expiry, address target);
@@ -142,6 +189,239 @@ library Events {
             mstore(0x00, iszero(iszero(approved))) // Convert to 0 or 1
             let m := shr(96, not(0))
             log3(0x00, 0x20, _SET_APPROVAL_COLLECTOR_EVENT_SIGNATURE, and(m, owner), and(m, collector))
+        }
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                            Hooks                           */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    event PoolDeployed(bytes32 indexed poolId, address indexed liquidityToken);
+
+    event HookAddLiquidity(
+        bytes32 indexed poolId,
+        address indexed sender,
+        address indexed receiver,
+        uint256 liquidity,
+        uint256 amount0Spent,
+        uint256 amount1Spent
+    );
+    event HookRemoveLiquidity(
+        bytes32 indexed poolId,
+        address indexed sender,
+        address indexed receiver,
+        uint256 liquidity,
+        uint256 amount0,
+        uint256 amount1
+    );
+
+    event HookSwap(
+        bytes32 indexed poolId,
+        address indexed sender,
+        int128 amount0,
+        int128 amount1,
+        uint128 hookLPfeeAmount0,
+        uint128 hookLPfeeAmount1
+    );
+
+    event HookFeesAccrued(bytes32 indexed poolId, uint128 curatorFee, uint128 protocolFee);
+
+    event HookCollectCuratorFeeCollected(bytes32 indexed poolId, address indexed receiver, uint256 fee);
+
+    event HookProtocolFeeCollected(bytes32 indexed poolId, address indexed receiver, uint256 fee);
+
+    // Vault configuration events
+    event VaultRatiosUpdated(
+        bytes32 indexed poolId,
+        uint256 indexed currencyIndex,
+        uint16 targetRawTokenRatio,
+        uint16 maxRawTokenRatio,
+        uint16 minRawTokenRatio
+    );
+
+    event VaultUpdated(
+        bytes32 indexed poolId, uint256 indexed currencyIndex, address indexed oldVault, address newVault
+    );
+
+    event VaultRatiosFrozen(bytes32 indexed poolId, uint256 indexed currencyIndex);
+
+    event VaultFrozen(bytes32 indexed poolId, uint256 indexed currencyIndex);
+
+    event VaultDeposit(
+        bytes32 indexed poolId, uint256 indexed currencyIndex, address indexed vault, uint256 assets, uint256 shares
+    );
+
+    event VaultWithdraw(
+        bytes32 indexed poolId,
+        uint256 indexed currencyIndex,
+        address indexed vault,
+        uint8 flowType,
+        uint256 assets,
+        uint256 shares
+    );
+
+    uint8 constant VAULT_WITHDRAW_FLOW_REFUND = 0;
+    uint8 constant VAULT_WITHDRAW_FLOW_REMOVE_LIQUIDITY = 1;
+    uint8 constant VAULT_WITHDRAW_FLOW_SWAP_JIT = 2;
+    uint8 constant VAULT_WITHDRAW_FLOW_REBALANCE = 3;
+    uint8 constant VAULT_WITHDRAW_FLOW_UNWIND = 4;
+
+    function emitPoolDeployed(bytes32 poolId, address liquidityToken) internal {
+        assembly {
+            log3(0x00, 0x00, _POOL_DEPLOYED_EVENT_SIGNATURE, poolId, and(shr(96, not(0)), liquidityToken))
+        }
+    }
+
+    function emitHookAddLiquidity(
+        bytes32 poolId,
+        address sender,
+        address receiver,
+        uint256 liquidity,
+        uint256 amount0Spent,
+        uint256 amount1Spent
+    ) internal {
+        assembly {
+            let fmp := mload(0x40)
+            mstore(0x00, liquidity)
+            mstore(0x20, amount0Spent)
+            mstore(0x40, amount1Spent)
+            let m := shr(96, not(0))
+            log4(0x00, 0x60, _HOOK_ADD_LIQUIDITY_EVENT_SIGNATURE, poolId, and(m, sender), and(m, receiver))
+            mstore(0x40, fmp)
+        }
+    }
+
+    function emitHookRemoveLiquidity(
+        bytes32 poolId,
+        address sender,
+        address receiver,
+        uint256 liquidity,
+        uint256 amount0,
+        uint256 amount1
+    ) internal {
+        assembly {
+            let fmp := mload(0x40)
+            mstore(0x00, liquidity)
+            mstore(0x20, amount0)
+            mstore(0x40, amount1)
+            let m := shr(96, not(0))
+            log4(0x00, 0x60, _HOOK_REMOVE_LIQUIDITY_EVENT_SIGNATURE, poolId, and(m, sender), and(m, receiver))
+            mstore(0x40, fmp)
+        }
+    }
+
+    function emitHookSwap(
+        bytes32 poolId,
+        address sender,
+        int128 amount0,
+        int128 amount1,
+        uint128 hookLPfeeAmount0,
+        uint128 hookLPfeeAmount1
+    ) internal {
+        assembly {
+            let fmp := mload(0x40)
+            mstore(0x00, sar(128, shl(128, amount0)))
+            mstore(0x20, sar(128, shl(128, amount1)))
+            let m := shr(128, not(0))
+            mstore(0x40, and(m, hookLPfeeAmount0))
+            mstore(0x60, and(m, hookLPfeeAmount1))
+            log3(0x00, 0x80, _HOOK_SWAP_EVENT_SIGNATURE, poolId, and(shr(96, not(0)), sender))
+            mstore(0x60, 0) // Restore the zero slot to zero
+            mstore(0x40, fmp) // Restore the free memory pointer
+        }
+    }
+
+    function emitHookFeesAccrued(bytes32 poolId, uint128 curatorFee, uint128 protocolFee) internal {
+        assembly {
+            let m := shr(128, not(0))
+            mstore(0x00, and(m, curatorFee))
+            mstore(0x20, and(m, protocolFee))
+            log2(0x00, 0x40, _HOOK_FEES_ACCRUED_EVENT_SIGNATURE, poolId)
+        }
+    }
+
+    function emitHookCollectCuratorFeeCollected(bytes32 poolId, address receiver, uint256 fee) internal {
+        assembly {
+            mstore(0x00, fee)
+            log3(
+                0x00, 0x20, _HOOK_COLLECT_CURATOR_FEE_COLLECTED_EVENT_SIGNATURE, poolId, and(shr(96, not(0)), receiver)
+            )
+        }
+    }
+
+    function emitHookProtocolFeeCollected(bytes32 poolId, address receiver, uint256 fee) internal {
+        assembly {
+            mstore(0x00, fee)
+            log3(
+                0x00, 0x20, _HOOK_COLLECT_PROTOCOL_FEE_COLLECTED_EVENT_SIGNATURE, poolId, and(shr(96, not(0)), receiver)
+            )
+        }
+    }
+
+    function emitVaultRatiosUpdated(
+        bytes32 poolId,
+        uint256 currencyIndex,
+        uint16 targetRawTokenRatio,
+        uint16 maxRawTokenRatio,
+        uint16 minRawTokenRatio
+    ) internal {
+        assembly {
+            let fmp := mload(0x40)
+            mstore(0x00, targetRawTokenRatio)
+            mstore(0x20, maxRawTokenRatio)
+            mstore(0x40, minRawTokenRatio)
+            log3(0x00, 0x60, _VAULT_RATIOS_UPDATED_EVENT_SIGNATURE, poolId, currencyIndex)
+            mstore(0x40, fmp) // Restore the free memory pointer
+        }
+    }
+
+    function emitVaultUpdated(bytes32 poolId, uint256 currencyIndex, address oldVault, address newVault) internal {
+        assembly {
+            let fmp := mload(0x40)
+            let m := shr(96, not(0))
+            mstore(0x00, and(m, newVault))
+            log4(0x00, 0x20, _VAULT_UPDATED_EVENT_SIGNATURE, poolId, currencyIndex, and(m, oldVault))
+            mstore(0x40, fmp) // Restore the free memory pointer
+        }
+    }
+
+    function emitVaultRatiosFrozen(bytes32 poolId, uint256 currencyIndex) internal {
+        assembly {
+            log3(0x00, 0x00, _VAULT_RATIOS_FROZEN_EVENT_SIGNATURE, poolId, currencyIndex)
+        }
+    }
+
+    function emitVaultFrozen(bytes32 poolId, uint256 currencyIndex) internal {
+        assembly {
+            log3(0x00, 0x00, _VAULT_FROZEN_EVENT_SIGNATURE, poolId, currencyIndex)
+        }
+    }
+
+    function emitVaultDeposit(bytes32 poolId, uint256 currencyIndex, address vault, uint256 assets, uint256 shares)
+        internal
+    {
+        assembly {
+            mstore(0x00, assets)
+            mstore(0x20, shares)
+            log4(0x00, 0x40, _VAULT_DEPOSIT_EVENT_SIGNATURE, poolId, currencyIndex, and(shr(96, not(0)), vault))
+        }
+    }
+
+    function emitVaultWithdraw(
+        bytes32 poolId,
+        uint256 currencyIndex,
+        address vault,
+        uint8 flowType,
+        uint256 assets,
+        uint256 shares
+    ) internal {
+        assembly {
+            let fmp := mload(0x40)
+            mstore(0x00, and(shr(248, not(0)), flowType))
+            mstore(0x20, assets)
+            mstore(0x40, shares)
+            log4(0x00, 0x60, _VAULT_WITHDRAW_EVENT_SIGNATURE, poolId, currencyIndex, and(shr(96, not(0)), vault))
+            mstore(0x40, fmp)
         }
     }
 

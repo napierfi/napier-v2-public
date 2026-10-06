@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
 /// @notice Forked from https://github.com/Uniswap/v4-core/blob/c8173143cf1e6f1c6c7b682a3563b263f149255f/src/libraries/CustomRevert.sol
@@ -20,6 +20,14 @@ library CustomRevert {
         assembly ("memory-safe") {
             mstore(0, selector)
             mstore(0x04, value)
+            revert(0, 0x24)
+        }
+    }
+
+    function revertWith(bytes4 selector, address value) internal pure {
+        assembly ("memory-safe") {
+            mstore(0, selector)
+            mstore(0x04, and(value, shr(96, not(0))))
             revert(0, 0x24)
         }
     }

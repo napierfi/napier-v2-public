@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
-import {Base} from "../Base.t.sol";
+import {Base} from "../TwoCryptoBase.t.sol";
 import {PrincipalTokenTest} from "../shared/PrincipalToken.t.sol";
 
 import {SSTORE2} from "solady/src/utils/SSTORE2.sol";
@@ -29,15 +29,7 @@ contract CollectFeesTest is PrincipalTokenTest {
     }
 
     function setUp() public override {
-        Base.setUp();
-        _deployTwoCryptoDeployer();
-        _setUpModules();
-        _deployInstance();
-
-        // Overwrite fee module to use MockFeeModule
-        FeePcts feePcts = FeePctsLib.pack(2_000, 0, 1000, 0, 200);
-        deployCodeTo("MockFeeModule", address(feeModule));
-        MockFeeModule(address(feeModule)).setFeePcts(feePcts);
+        super.setUp();
 
         // Toy data setup: deposit some shares
         uint256 lscale = resolver.scale();
@@ -157,7 +149,7 @@ contract CollectFeesTest is PrincipalTokenTest {
         address[] memory modules = ModuleAccessor.read(pointer);
         ModuleAccessor.set(modules, REWARD_PROXY_MODULE_INDEX, address(0));
         address newPointer = SSTORE2.write(abi.encode(modules));
-        vm.prank(address(factory));
+        vm.prank(address(dummyFactory));
         principalToken.setModules(newPointer);
 
         // Pre-condition
@@ -183,7 +175,7 @@ contract CollectFeesTest is PrincipalTokenTest {
         address[] memory modules = ModuleAccessor.read(pointer);
         ModuleAccessor.set(modules, REWARD_PROXY_MODULE_INDEX, address(0));
         address newPointer = SSTORE2.write(abi.encode(modules));
-        vm.prank(address(factory));
+        vm.prank(address(dummyFactory));
         principalToken.setModules(newPointer);
 
         // Pre-condition

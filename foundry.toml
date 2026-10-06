@@ -1,24 +1,59 @@
 [profile.default]
-solc = "0.8.24"
+# solc = "0.8.24"
 src = "src"
 out = "out"
 libs = ["node_modules"]
 evm_version = "cancun"
-remapping = [
+sparse_mode = true
+remappings = [
     "solady/=node_modules/solady/",
-    "@openzeppelin/=node_modules/@openzeppelin/contracts/",
-    "forge-std/src/=node_modules/forge-std/",
+    "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+    "forge-std/=node_modules/forge-std/",
+    "@uniswap/v4-core/=node_modules/@uniswap/v4-core/",
+    "@uniswap/v4-periphery/=node_modules/@uniswap/v4-periphery/",
+    "@uniswap/permit2/=node_modules/@uniswap/permit2/",
+    "@uniswap/universal-router/=node_modules/@uniswap/universal-router/",
+    "permit2/=node_modules/@uniswap/permit2/",
+    "multicaller/=node_modules/multicaller/",
+    "halmos-cheatcodes/=node_modules/halmos-cheatcodes/",
+    "solmate/=node_modules/solmate/",
 ]
 
 # optimizer_runs = 1_000_000
 optimizer = true
 optimizer_runs = 1
 
+# Cap floating pragmas at the compiler version used by the release branch.
+compilation_restrictions = [
+    { paths = "**", version = "<=0.8.26" },
+]
+
 block_timestamp = 100_000_0000
+
+fs_permissions = [{ access = "read", path = "./deployments/oracles" }]
+
+ignored_error_codes = [
+    2072, # unused-var
+    2018, # func-mutability
+    5667, # unused-param
+    2394, # transient-storage
+    3860, # init-code-size
+    5574, # spurious-dragon-limit
+]
 
 [doc]
 out = "docs/foundry-docs"
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[lint]
+ignore = ["test/**/*.sol"]
+exclude_lints = [
+    "mixed-case-function",
+    "mixed-case-variable",
+    "screaming-snake-case-immutable",
+    "unaliased-plain-import",
+]
+severity = ["high", "medium"]
 
 [profile.ci.invariant]
 depth = 15
@@ -33,8 +68,14 @@ fail_on_revert = true
 mainnet = 'https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
 arbitrum = 'https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
 base = 'https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
-tenderly_eth = { key = "${TENDERLY_ACCESS_TOKEN}", chain = 1, url = '${TENDERLY_DEV_NET_RPC_URL}' }
-tenderly_arb = { key = "${TENDERLY_ACCESS_TOKEN}", chain = 42161, url = '${TENDERLY_DEV_NET_ARB}' }
+polygon = 'https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
+sonic = 'https://sonic-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
+robinhood = 'https://robinhood-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}'
+
+tenderly_eth = { key = "${TENDERLY_EXPLORER_API_KEY}", chain = 1, url = '${TENDERLY_ETH_DEV_NET}' }
+tenderly_arb = { key = "${TENDERLY_EXPLORER_API_KEY}", chain = 42161, url = '${TENDERLY_DEV_NET_ARB}' }
 
 [etherscan]
 sonic = { key = "${SONICSCAN_API_KEY}", chain = 146, url = "https://sonicscan.org/" }
+unknown_chain = { key = "${TENDERLY_EXPLORER_API_KEY}", chain = 1, url = "${TENDERLY_ETH_DEV_NET}/verify/etherscan" }
+tempo = { key = "${TEMPO_RPC_URL}", chain = 4217, url = "https://contracts.tempo.xyz" }

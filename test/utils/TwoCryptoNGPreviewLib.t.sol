@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
 
-import {TwoCryptoZapAMMTest} from "../shared/Zap.t.sol";
-import {ITwoCrypto} from "../shared/ITwoCrypto.sol";
+import {TwoCryptoZapAMMTest} from "../shared/twocrypto/Zap.t.sol";
+import {ITwoCrypto} from "../shared/twocrypto/ITwoCrypto.sol";
 
 import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";
 import {ERC20} from "solady/src/tokens/ERC20.sol";

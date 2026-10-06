@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -11,7 +11,7 @@ contract RoundTripConversionTest is PrincipalTokenTest {
         _delta_ = 0;
     }
 
-    function test_RT_principal_underlying(Init memory init, uint256 shares, uint96 timeJump) public boundInit(init) {
+    function test_RT_principal_underlying(Init memory init, uint256 shares, uint32 timeJump) public boundInit(init) {
         setUpVault(init);
         skip(timeJump);
 
@@ -27,7 +27,7 @@ contract RoundTripSupplyTest is PrincipalTokenTest {
         _delta_ = 0;
     }
 
-    function test_RT_supply_combine(Init memory init, uint256 shares, uint96 timestamp) public boundInit(init) {
+    function test_RT_supply_combine(Init memory init, uint256 shares, uint32 timestamp) public boundInit(init) {
         setUpVault(init);
         address caller = init.user[0];
         shares = bound(shares, 0, _max_supply(caller));

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -323,7 +323,7 @@ contract CollectPostSettlement_MaximumPerformanceFee_AccrualTest is CollectPostS
 }
 
 contract PreviewCollectTest is PrincipalTokenTest {
-    function testFuzz_Preview(Init memory init, uint64 timeJump, FeePcts newFeePcts, bool settle)
+    function testFuzz_Preview(Init memory init, uint32 timeJump, FeePcts newFeePcts, bool settle)
         public
         boundInit(init)
     {

@@ -1,73 +1,62 @@
-# Uniswap v4 public port (preparation only)
+# Uniswap v4 release snapshot
 
-## Status
-
-This draft does **not** contain the release's Solidity changes yet. It records the pinned source and provides a local, dry-run-first snapshot helper. Do not merge it as a completed release port.
-
-The connected environment could inspect the repositories but could not complete a bulk transfer or run Foundry. No import workflow was installed. The helper never fetches, stages, commits, pushes, or deploys anything.
-
-## Pinned inputs
+## Provenance and scope
 
 - Source: `napierfi/napier-v2`, `release/uniswap-v4` at `4475064276a0fc782e4a18a6fe0be3e01381bd63`.
 - Public base: `napierfi/napier-v2-public`, `main` at `9a3cb443574d8979a1a2bb46e92b6bf5936489c5`.
-- Public PR branch: `chore/import-uniswap-v4-4475064`.
+- Contract and test trees are exact committed snapshots, including obsolete-path deletions and executable modes. No private Git history is imported.
 
-Expected source Git trees:
+| Path | Files | Verified Git tree SHA |
+| --- | ---: | --- |
+| `src/` | 138 | `e12b96014c892fd082344bed96b21c01b8e4d637` |
+| `test/` | 225 | `87dadc128fb853cf840bd996ee0b9c2786b70c88` |
 
-| Path | Tree SHA |
-| --- | --- |
-| `src` | `e12b96014c892fd082344bed96b21c01b8e4d637` |
-| `test` | `87dadc128fb853cf840bd996ee0b9c2786b70c88` |
-| `script` | `e71022751aa743c0a604007cb636e3871a1532d5` |
+The build configuration, dependency manifest, and pnpm lockfile match the source revision. Public CI uses Foundry v1.3.6 and a frozen dependency installation. The environment example uses the RPC/explorer variable names required by that build configuration.
 
-## Scope and publication review
+The snapshot includes TokiHook/TokiHookLogic, TokiPoolToken and its deployer, UniswapV4Router, pool-specific lenses/quoters/oracles, rehypothecation utilities, wrapper/resolver additions, and the corresponding tests. TwoCrypto contracts remain available at their release paths. No compatibility contracts or release-local Solidity edits are added.
 
-The helper replaces the tracked `src/`, `test/`, and `script/` snapshots, including obsolete-file deletions and executable bits. It copies `.env.example`, `.gitignore`, `foundry.toml`, `package.json`, `pnpm-lock.yaml`, and `slither.config.json` from the pinned source. It reads committed blobs, never the source checkout's uncommitted files, and does not import private Git history.
+Operational `script/`, private environment files, internal agent/editor configuration, research/planning documents, and deployment records are not imported. Public `LICENSE`, `audits/`, and existing `deployments/` records are preserved. Historical audits and addresses are not presented as verification of this release. The public integration guide documents the current contract/artifact boundaries.
 
-It deliberately leaves the public `LICENSE`, `audits/`, `README.md`, `docs/`, `deployments/`, and `.github/` untouched. Internal agent/editor settings and non-example environment files outside the selected code trees are not selected. Public documentation, deployment configuration, and CI must be reviewed separately before this port is ready; this helper alone is not a complete release publication.
+## Local verification
 
-The source `package.json` declares `BUSL-1.1`, and its README states BUSL licensing. The public repository currently contains GPL v3 in `LICENSE`. A maintainer must resolve and document the intended publication terms; this draft does not choose new terms, relabel Solidity headers, or overwrite the public license. `--license-reviewed` is an explicit acknowledgement, not a license-resolution mechanism.
+Toolchain: Foundry `1.3.6-dev`, commit `d2415887096b10226d13af9240b5bef5e6b0d815`; pnpm `10.33.0`. CI pins the tagged Foundry v1.3.6 release.
 
-The helper rejects symlinks/submodules in its selected trees, destination symlinks, local-file collisions, a dirty public checkout, and selected public-code changes since the pinned base. It checks a small set of credential patterns before writing. This is only a guardrail, **not** a complete secret scan or publication approval. Review all selected operational scripts and fixtures before pushing them.
+Verified:
 
-## Finish the port locally
-
-Use existing local checkouts with access to the pinned commits. Check out the public PR branch in `napier-v2-public`; do not work on `main`.
-
-```sh
-cd /path/to/napier-v2-public
-python3 tools/port_uniswap_v4.py --source /path/to/napier-v2 --target .
-```
-
-The default is a dry run. After resolving/documenting the license discrepancy and reviewing the selected content:
+- `pnpm install --frozen-lockfile`: succeeded.
+- `forge fmt --check`: succeeded.
+- `forge build --dynamic-test-linking --skip test --threads 2`: succeeded with Solc 0.8.24 and 0.8.26.
+- Staged `src` and `test` tree hashes: match the table above.
+- Uniswap v4 unit/fuzz selection: **59 suites, 406 passed, 0 failed, 47 skipped**. Skips are already present in the source tests.
+- Credential-free CI unit/fuzz/bounded-invariant selection from README: **228 suites, 1338 passed, 0 failed, 80 skipped**.
+- Codespell 2.4.3 with the workflow's filename/skip/ignore options: succeeded.
+- Morpho MEVUSDC Uniswap v4 fork integration: **7 passed, 0 failed, 0 skipped**, including pool creation/liquidity, PT/YT buy/sell, lifecycle, and pre-maturity withdrawal.
 
 ```sh
-python3 tools/port_uniswap_v4.py --source /path/to/napier-v2 --target . --apply --license-reviewed
-git diff --stat
-git diff --check
+forge test --dynamic-test-linking \
+  --match-path 'test/{hooks,oracles,zap/uniswap,lens/uniswap,factory/uniswap-v4}/**' \
+  --skip integrations twocrypto wrapper invariant \
+  --no-match-test testFork --threads 2 --summary
 ```
 
-The helper verifies copied blob hashes and file modes. It changes only the working tree; review, stage, and commit the changes on this same PR branch yourself. After staging, compare `git rev-parse "$(git write-tree):src"` (and `:test`, `:script`) to the expected trees above. Resolve the public README, documentation, deployment data, and CI as separate, explicitly reviewed changes.
+An isolated, throwaway `forge script` scenario also deployed the real TokiHook with a mined CREATE2 hook address and its library, deployed a market/router using the release fixtures, funded mock base assets, deposited vault shares, issued PT/YT, added liquidity, and executed an underlying-to-YT swap through Permit2 and UniswapV4Router. It checked the recipient's YT output floor, payer maximum input, and absence of router token/ETH residue. Observed base-unit results:
 
-With the release toolchain (Foundry v1.3.6; pnpm 9 / Node.js 22), run:
+| Observable | Value |
+| --- | ---: |
+| LP minted | `63245570547` |
+| Underlying shares spent | `323455559` |
+| YT received | `6917265175` |
 
-```sh
-pnpm install --frozen-lockfile
-forge fmt --check
-forge build --dynamic-test-linking --skip=test
-forge test --dynamic-test-linking --no-match-test='(invariant_|testFork)'
-```
+The scenario ran in Foundry's local EVM; no live transactions were broadcast. Fixtures supplied mocked assets and the precompiled PoolManager/Permit2 deployments. The oversized scenario runner had the code-size limit disabled; this is not proof of a production deployment ceremony. The throwaway script and snapshot-helper scaffolding are not part of the deliverable.
 
-Run the relevant invariant, fork, and integration tests separately with locally configured RPC access. Do not paste credentials into the PR, source files, or workflow definitions.
+## Test selection and external dependencies
 
-## Validation recorded for this draft
+The credential-free command in [README](../../README.md) and public CI includes local unit/fuzz tests and bounded invariants. It excludes RPC-backed contracts whose constructors or setup create forks, in addition to `testFork` functions. Compilation skips reduce the build scope but do not reliably exclude cached test artifacts from execution; explicit contract exclusions enforce the offline boundary. No imported test contracts are changed.
 
-Seven offline Python helper tests passed in the authoring environment:
+Excluded fork suites remain available for explicit runs with valid RPC access. The Morpho MEVUSDC fork suite was exercised with locally supplied RPC credentials; the remaining fork integrations, live aggregator API, and symbolic suites were not run. `AggregationRouterTest` additionally requires opt-in FFI, `bash`, `curl`, `jq`, and live external API access. Local script evidence does not establish a live deployment.
 
-```sh
-python3 -m unittest discover -s tools -p 'test_port_uniswap_v4.py' -v
-```
+## Publication review and merge requirements
 
-These cover scope selection, add/modify/delete and mode handling, public-license/audit preservation, collision/symlink rejection, committed-blob reads, and a synthetic credential sentinel. They do **not** establish Solidity build/test success. The helper has not yet been run against a full local copy of the real release.
+Two independent read-only reviews covered publication exposure and migration consistency. No evidence-backed production credential leak was identified in the selected files; patterned fixture keys and embedded deployment bytecode were classified as test data, not production secrets. The reviews were scoped migration checks, not a complete smart-contract audit or exhaustive secret scan. Upstream attribution, including the exact Pendle oracle reference in `LibOracle`, is preserved.
 
-Before marking ready: complete the real snapshot import, reconcile licensing and public-facing material, inspect the final diff for publication safety, verify tree hashes, and record actual build/test/CI results. The public base branch and deployed contracts must remain unchanged until the normal review process completes.
+**Licensing remains unresolved.** The public root `LICENSE` contains GPL v3, while imported Napier Solidity headers and package metadata declare BUSL-1.1. Other imported files carry file-specific MIT/GPL/UNLICENSED declarations. None of these declarations has been rewritten, and copying the snapshot does not establish authorization to relicense it or a uniform resolved publication license. Responsible rights holders must reconcile the terms before merge. Keep the public pull request in draft until that decision is recorded.

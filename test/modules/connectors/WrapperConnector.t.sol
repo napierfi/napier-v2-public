@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "forge-std/src/Test.sol";
@@ -6,8 +6,9 @@ import "forge-std/src/Test.sol";
 import {ERC20} from "solady/src/tokens/ERC20.sol";
 import {LibClone} from "solady/src/utils/LibClone.sol";
 import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";
+import {DynamicArrayLib} from "solady/src/utils/DynamicArrayLib.sol";
 
-import {ERC4626WrapperConnector} from "src/modules/connectors/ERC4626WrapperConnector.sol";
+import {WrapperConnector, toDynamicArray} from "src/modules/connectors/WrapperConnector.sol";
 import {MockWrapper} from "../../mocks/MockWrapper.sol";
 import {MockERC4626} from "../../mocks/MockERC4626.sol";
 import {MockERC20} from "../../mocks/MockERC20.sol";
@@ -25,7 +26,9 @@ using {into} for MockERC20;
 using {into} for MockWETH;
 using {into} for MockERC4626;
 
-abstract contract ERC4626WrapperConnectorTest is Test {
+using DynamicArrayLib for DynamicArrayLib.DynamicArray;
+
+abstract contract WrapperConnectorTest is Test {
     uint256 constant INITIAL_BALANCE = 100 ether;
     Token constant NATIVE_ETH = Token.wrap(Constants.NATIVE_ETH);
 
@@ -33,13 +36,13 @@ abstract contract ERC4626WrapperConnectorTest is Test {
 
     address s_wrapperConnectorImplementation;
     address s_wrapperImplementation;
-    ERC4626WrapperConnector s_connector;
+    WrapperConnector s_connector;
     MockWrapper s_wrapper;
     MockERC4626 s_vault;
     MockERC20 s_asset;
 
     function setUp() public {
-        s_wrapperConnectorImplementation = address(new ERC4626WrapperConnector());
+        s_wrapperConnectorImplementation = address(new WrapperConnector());
         s_wrapperImplementation = address(new MockWrapper());
         (s_asset, s_vault, s_wrapper, s_connector) = deploy();
 
@@ -63,7 +66,13 @@ abstract contract ERC4626WrapperConnectorTest is Test {
     function deploy()
         internal
         virtual
-        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, ERC4626WrapperConnector connector);
+        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, WrapperConnector connector);
+
+    function test_Immutables() public view {
+        assertEq(s_connector.asset(), address(s_asset), "asset");
+        assertEq(s_connector.target(), address(s_wrapper), "target");
+        assertEq(address(s_connector.i_wrapper()), address(s_wrapper), "i_wrapper");
+    }
 
     function test_DepositAsset() public {
         uint256 totalSupply = s_vault.totalSupply();
@@ -126,7 +135,7 @@ abstract contract ERC4626WrapperConnectorTest is Test {
     }
 
     function testFuzz_PreviewDeposit(uint256 index, uint256 amount) public view {
-        Token[] memory tokens = s_wrapper.getTokenInList();
+        Token[] memory tokens = s_connector.getTokenInList();
         Token token = tokens[index % tokens.length];
         uint256 preview = s_connector.previewDeposit(token, amount);
         uint256 expected = s_wrapper.previewDeposit(token, amount);
@@ -134,31 +143,115 @@ abstract contract ERC4626WrapperConnectorTest is Test {
     }
 
     function testFuzz_PreviewRedeem(uint256 index, uint256 amount) public view {
-        Token[] memory tokens = s_wrapper.getTokenInList();
+        Token[] memory tokens = s_connector.getTokenOutList();
         Token token = tokens[index % tokens.length];
         uint256 preview = s_connector.previewRedeem(token, amount);
         uint256 expected = s_wrapper.previewRedeem(token, amount);
         assertEq(preview, expected);
     }
 
-    function test_getTokenInList() public view {
-        Token[] memory tokens = s_connector.getTokenInList();
-        Token[] memory expected = s_wrapper.getTokenInList();
-        assertEq(abi.encode(tokens), abi.encode(expected));
+    function test_ConvertToShares(uint256 underlyings, uint256 amount) public {
+        uint256 balance = s_vault.balanceOf(alice);
+        underlyings = bound(underlyings, 0, balance);
+        s_vault.approve(address(s_connector), underlyings);
+        s_connector.deposit(s_vault.into(), underlyings, alice);
+
+        assertEq(s_connector.convertToShares(amount), s_wrapper.convertToShares(amount), "convertToShares");
     }
 
-    function test_getTokenOutList() public view {
-        Token[] memory tokens = s_connector.getTokenOutList();
-        Token[] memory expected = s_wrapper.getTokenOutList();
-        assertEq(abi.encode(tokens), abi.encode(expected));
+    function test_ConvertToAssets(uint256 underlyings, uint256 amount) public {
+        uint256 balance = s_vault.balanceOf(alice);
+        underlyings = bound(underlyings, 0, balance);
+        s_vault.approve(address(s_connector), underlyings);
+        s_connector.deposit(s_vault.into(), underlyings, alice);
+
+        assertEq(s_connector.convertToAssets(amount), s_wrapper.convertToAssets(amount), "convertToAssets");
+    }
+
+    function test_GetTokenList() public virtual {
+        Token[] memory tokens;
+        if (address(s_asset) != Constants.WETH_ETHEREUM_MAINNET) {
+            tokens = new Token[](2);
+            tokens[0] = Token.wrap(address(s_asset));
+            tokens[1] = Token.wrap(address(s_vault));
+        } else {
+            tokens = new Token[](3);
+            tokens[0] = Token.wrap(address(s_asset));
+            tokens[1] = Token.wrap(address(s_vault));
+            tokens[2] = NATIVE_ETH;
+        }
+
+        // When token list already includes native token
+        vm.mockCall(address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenInList.selector), abi.encode(tokens));
+        vm.mockCall(
+            address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenOutList.selector), abi.encode(tokens)
+        );
+
+        DynamicArrayLib.DynamicArray[] memory results = new DynamicArrayLib.DynamicArray[](2);
+        results[0] = toDynamicArray(s_connector.getTokenInList());
+        results[1] = toDynamicArray(s_connector.getTokenOutList());
+
+        for (uint256 i = 0; i < results.length; i++) {
+            if (address(s_asset) != Constants.WETH_ETHEREUM_MAINNET) {
+                assertEq(results[i].asAddressArray().length, 2, "tokens.length");
+                assertTrue(results[i].contains(address(s_asset)), "Token not in list");
+                assertTrue(results[i].contains(address(s_vault)), "Token not in list");
+            } else {
+                assertEq(results[i].asAddressArray().length, 3, "tokens.length");
+                assertTrue(results[i].contains(address(s_asset)), "Token not in list");
+                assertTrue(results[i].contains(address(s_vault)), "Token not in list");
+                assertTrue(results[i].contains(Constants.NATIVE_ETH), "Token not in list");
+            }
+        }
+    }
+
+    function testFuzz_GetTokenList_When_NativeTokenAlreadyInList(Token[] memory tokens) public {
+        vm.assume(tokens.length > 0);
+        tokens[0] = NATIVE_ETH;
+
+        // When token list already includes native token
+        vm.mockCall(address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenInList.selector), abi.encode(tokens));
+        vm.mockCall(
+            address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenOutList.selector), abi.encode(tokens)
+        );
+
+        // tokenInList
+        Token[] memory result1 = s_connector.getTokenInList();
+        assertEq(result1.length, tokens.length, "tokens.length");
+        assertEq(abi.encode(result1), abi.encode(tokens), "tokens mismatch");
+
+        // tokenOutList
+        Token[] memory result2 = s_connector.getTokenOutList();
+        assertEq(result2.length, tokens.length, "tokens.length");
+        assertEq(abi.encode(result2), abi.encode(tokens), "tokens mismatch");
+    }
+
+    function testFuzz_GetTokenList(Token[] memory tokens) public {
+        vm.mockCall(address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenInList.selector), abi.encode(tokens));
+        vm.mockCall(
+            address(s_wrapper), abi.encodeWithSelector(MockWrapper.getTokenOutList.selector), abi.encode(tokens)
+        );
+
+        DynamicArrayLib.DynamicArray[] memory results = new DynamicArrayLib.DynamicArray[](2);
+        results[0] = toDynamicArray(s_connector.getTokenInList());
+        results[1] = toDynamicArray(s_connector.getTokenOutList());
+
+        for (uint256 i = 0; i < results.length; i++) {
+            if (toDynamicArray(tokens).contains(Constants.WETH_ETHEREUM_MAINNET)) {
+                assertTrue(results[i].contains(Constants.NATIVE_ETH), "native ETH should be in list");
+            }
+            for (uint256 j = 0; j < tokens.length; j++) {
+                assertTrue(results[i].contains(tokens[j].unwrap()), "token not in list");
+            }
+        }
     }
 }
 
-contract ERC4626WrapperConnectorERC20Test is ERC4626WrapperConnectorTest {
+contract WrapperConnectorERC20Test is WrapperConnectorTest {
     function deploy()
         internal
         override
-        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, ERC4626WrapperConnector connector)
+        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, WrapperConnector connector)
     {
         asset = new MockERC20(18);
         vault = new MockERC4626(ERC20(address(asset)), false);
@@ -167,15 +260,15 @@ contract ERC4626WrapperConnectorERC20Test is ERC4626WrapperConnectorTest {
         wrapper.initialize();
 
         bytes memory args1 = abi.encode(wrapper, Constants.WETH_ETHEREUM_MAINNET);
-        connector = ERC4626WrapperConnector(LibClone.clone(s_wrapperConnectorImplementation, args1));
+        connector = WrapperConnector(payable(LibClone.clone(s_wrapperConnectorImplementation, args1)));
     }
 }
 
-contract ERC4626WrapperConnectorNativeETHTest is ERC4626WrapperConnectorTest {
+contract WrapperConnectorNativeETHTest is WrapperConnectorTest {
     function deploy()
         internal
         override
-        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, ERC4626WrapperConnector connector)
+        returns (MockERC20 asset, MockERC4626 vault, MockWrapper wrapper, WrapperConnector connector)
     {
         vm.etch(Constants.WETH_ETHEREUM_MAINNET, address(new MockWETH()).code);
         asset = MockERC20(payable(Constants.WETH_ETHEREUM_MAINNET));
@@ -185,15 +278,17 @@ contract ERC4626WrapperConnectorNativeETHTest is ERC4626WrapperConnectorTest {
         wrapper.initialize();
 
         bytes memory args1 = abi.encode(wrapper, Constants.WETH_ETHEREUM_MAINNET);
-        connector = ERC4626WrapperConnector(LibClone.clone(s_wrapperConnectorImplementation, args1));
+        connector = WrapperConnector(payable(LibClone.clone(s_wrapperConnectorImplementation, args1)));
     }
 
     function test_DepositNativeETH() public {
         uint256 value = 10 ether;
 
+        uint256 preview = s_connector.previewDeposit(NATIVE_ETH, value);
         uint256 totalSupply = s_vault.totalSupply();
         uint256 shares = s_connector.deposit{value: value}(NATIVE_ETH, value, alice);
 
+        assertEq(preview, shares, "preview");
         assertEq(s_vault.totalSupply(), totalSupply + s_vault.previewDeposit(value), "totalSupply");
         assertEq(s_wrapper.balanceOf(alice), shares, "shares balance");
     }
@@ -204,9 +299,11 @@ contract ERC4626WrapperConnectorNativeETHTest is ERC4626WrapperConnectorTest {
         uint256 shares = s_connector.deposit{value: valueIn}(NATIVE_ETH, valueIn, alice);
 
         uint256 redeemAmount = shares / 2;
+        uint256 preview = s_connector.previewRedeem(NATIVE_ETH, redeemAmount);
         s_wrapper.approve(address(s_connector), shares);
         uint256 valueOut = s_connector.redeem(NATIVE_ETH, redeemAmount, alice);
 
+        assertEq(preview, valueOut, "preview");
         assertEq(alice.balance, INITIAL_BALANCE - valueIn + valueOut, "ETH balance");
         assertEq(s_wrapper.balanceOf(alice), shares - redeemAmount, "shares balance");
     }

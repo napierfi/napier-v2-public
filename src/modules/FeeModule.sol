@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import {SafeCastLib} from "solady/src/utils/SafeCastLib.sol";
@@ -25,6 +25,8 @@ contract ConstantFeeModule is FeeModule {
     uint256 private constant MAX_SPLIT_RATIO_BPS = 9_500;
 
     FeePcts private s_feePcts;
+
+    event FeeSplitRatioUpdated(uint16 oldSplitRatioBps, uint16 newSplitRatioBps);
 
     /// @notice Initialize the fee module with the given fee parameters
     /// @dev The fee parameters are encoded as follows: abi.encode(principalToken, abi.encode(FeePcts))
@@ -89,6 +91,9 @@ contract ConstantFeeModule is FeeModule {
         if (_splitRatio == 0) {
             revert Errors.FeeModule_SplitFeeTooLow();
         }
-        s_feePcts = FeePctsLib.updateSplitFeePct(s_feePcts, _splitRatio.toUint16());
+        uint16 oldSplitRatio = FeePctsLib.getSplitPctBps(s_feePcts);
+        uint16 newSplitRatio = _splitRatio.toUint16();
+        s_feePcts = FeePctsLib.updateSplitFeePct(s_feePcts, newSplitRatio);
+        emit FeeSplitRatioUpdated(oldSplitRatio, newSplitRatio);
     }
 }

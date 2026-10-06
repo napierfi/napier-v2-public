@@ -1,7 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
+import {MockERC20} from "../mocks/MockERC20.sol";
 import {LibClone} from "solady/src/utils/LibClone.sol";
 import {Initializable} from "solady/src/utils/Initializable.sol";
 
@@ -10,6 +11,8 @@ import {VerificationStatus} from "src/Types.sol";
 import {DepositCapVerifierModule} from "src/modules/VerifierModule.sol";
 import {AccessManager} from "src/modules/AccessManager.sol";
 import {BASIS_POINTS} from "src/Constants.sol";
+
+import {MockERC20} from "../mocks/MockERC20.sol";
 
 /// @dev Dummy contract for vm.mockCall. Calls to mocked addresses may revert if there is no code on the address.
 contract Dummy {}
@@ -37,7 +40,7 @@ contract VerifierModuleTest is Test {
         // Deploy mock contracts
         mockAccessManager = new Dummy();
         mockPrincipalToken = new Dummy();
-        mockUnderlying = address(deployMockERC20("Mock", "MOCK", 8));
+        mockUnderlying = address(new MockERC20(8));
 
         vm.label(address(mockAccessManager), "AccessManager");
         vm.label(address(mockPrincipalToken), "mockPrincipalToken");

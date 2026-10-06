@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.10;
 
 import "forge-std/src/Test.sol";
@@ -123,7 +123,7 @@ contract EquivalenceTest is PrincipalTokenTest {
         assertApproxEqAbs(shares2, shares, _delta_, "Equivalence:unite_combine");
     }
 
-    function test_EQ_PreviewUnite(uint96 timeJump) public {
+    function test_EQ_PreviewUnite(uint32 timeJump) public {
         setUpVault();
         address caller = init.user[0];
         uint256 shares = 13138980134;
