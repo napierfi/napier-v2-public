@@ -4,13 +4,18 @@ chain:
   contracts:
     # Core contracts
     factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
-    factory_impl: "0xCd10974c9F2CBBF02d7537D107BDD282DF6Bd443"
+    factory_impl: "0xC2ceE949F2e08FfE0A5Aa13baB36cD337e8AB597"
     access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
-    access_manager_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+    access_manager_impl: "0xcaf5C42bCD7BeBD886318A5992c65d161468A97B"
 
     # Module implementations
     constant_fee_module_impl: "0xb01D378CAeB7CD5F84221A250F2DE0bE302c0c4a"
-    deposit_cap_verifier_module_impl: "0x5e6cec1D20e079bf824C249f821d5E0684Df47d6"
+    deposit_cap_verifier_module_impl: "0x938e089BaA41c750A96799d2D0c8b6fBb588A782"
+    limit_order_config_module_impl: ""
+    morpho_reward_proxy_impl: "0xEb932980b4F2225a68F9B6d46fd93d743fF27E28"
+    merkl_reward_proxy_impl: "0x27013901542FD879968efe1B400B0d754C879145"
+    wrapper_reward_proxy_impl: "0x3c1f9Df2f1C58CeEF741A0BC4b916Be32465EC3c"
+    silo_reward_proxy_impl: "0x55f1901D1590C4235804081B77c69851BB669720"
     pt_blueprint: "0x50f1D68CF2C61bFCBc2E8EB2c8f1fB1EC03688f9"
     yt_blueprint: "0xF3e3Aa61dFfA1e069FD27202Cc8845aF05170D2A"
 
@@ -20,6 +25,7 @@ chain:
     constant_price_resolver_blueprint: "0xb79d712B9D6dF8a150A5a78e04FeE4C0f230f536"
     custom_conversion_resolver_blueprint: "0x1451e304ec493b072943BFcE36c3129D20378332"
     external_price_resolver_blueprint: "0x56B56722E03Ab2A56e70d45d6829BE9D8D3225E8"
+    chainlink_resolver_blueprint: "0xF6f3d01C45d95d58a177c6DF054014E929b25F89"
     twocrypto_deployer: "0x129D398a6116a13Cc0D1AE8833B0490C2D53Cf37"
 
     # Periphery contracts
@@ -27,20 +33,71 @@ chain:
     vault_connector_registry: "0x5F44286B6AA9D7aAEC73abcF627e32b0E048fC9a"
     aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
     twocrypto_zap: "0x0000001d41857cb60F6BE0C9Fe74B9e69E1e5234"
-    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
+    quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd" # old implementation 
     lens: "0x0000006178ee874e0ae58b131b8a5fcbe78cab2f"
     quoter_impl: "0x22cB9A13B8bd1746f9CEC5921710B3e33d2AdE98"
-    lens_impl: "0x956A1BCf039E25c1870F4748dfB72755B9d215FA"
-    impersonator: "0xC5897Bb055Bfdc5e914b89229A323B0309d85836"
+    lens_impl: "0x7b5ed75ab898326f9301f00a07f990a15074cc91"
+    impersonator: "0x0FB7CeF75D5a93ddb19b38c998835008c2681B31"
+    wrapper_connector_impl: "0x6D5683b1254195B28cf988Ae593e2Ea25850d703"
+    wrapper_factory: "0x44445C34Daf19cF0D7721Ecf4be42F2538ac00c8"
+    price_provider_impl: "0x4167EBA0E60e938618C4eFe1ebc6177D9777860b"
+    price_provider: "0x000000bA92d1f66c46722F0f4c035515d2b006A3"
+    principal_token_quoter: "0x0000003db4b656AbDEB9860a924AC59459ECFB41"
+    principal_token_quoter_impl: "0xC47Ef9187179AB752ddF38236bB6a6E5AD7e73aE"
+
+    # V4 contracts
+    pool_fee_module_impl: "0x5E2a85e75E908E5B736f479a03241BBe0Da4FF25"
+    toki_pool_deployer: "0x3333fa2BEd91533D8Fe0F1B641582343A8529469"
+    toki_pool_token_impl: "0x2866d4a574a582A10f2CAC18CE795ED1fE0C34E7"
+    toki_hook: "0xB046529771F5D01974913056843f1F0F77D81888"
+
+    # V4 periphery contracts
+    v4_router: "0x00000000D6C19A173f3C739F01fD171A7C9C245b"
+    state_view: "0x1eBF7B2522b796a873454c2eF1348CE83b1eB0aE"
+    toki_quoter: "0x000000f682bfa913574bFa448C33260CB598CfC7"
+    toki_quoter_impl: "0xA437Da8Db66D1054C177a6b9d986386A7Dd88213"
+    toki_lens: "0x00000031F662013D68E6CD0ceFe97043AE0ac5b8"
+    toki_lens_impl: "0xfc72513d7b705CE691aC4Fff8937630b1A74C92A"
+    toki_swap_bin_search: "0xcb43Ef61995561B733ff18a0CCf625908024b460"
+    toki_oracle: "0x3f2d926F77410254816aB5CfCd531eCc60395d5e"
+    toki_oracle_impl: "0x52e9c79e58797A1A5F32E2E539541D1ABeA99D9B"
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: "0x00000013f81B2e719d7183CFDd9f0e46CFbC8564"
+    toki_linear_price_oracle_impl: "0x37733912106dD57f45c128Cb380E6331C85D349f"
+    toki_twap_oracle_impl: "0x80a4bf5c2aFfE2F131a9dF80d5bd90AcFFCD2002"
+
+    # wrapper implementation
+    atoken_wrapper_impl: "0x9fE5Ae99dbD13279644aD1841AF7E286684921F2"
+    convex_wrapper_impl: "0x542F008E4584A847Fb4816DE92460b7fF5AE6DF0"
 
     # External contracts
+    feed_registry: "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+    pyth_price_feed: "0x4305FB66699C3B2702D4d05CF36551390A4c69C6"
+    # Pyth oracle adapter instances, ordered to match deployments/oracles/eth-pyth-oracles.json
+    pyth_aggregator_v3_implementation: "0xdaF778bA301fDe885177568740Bf9bcD8114C14e"
+    pyth_oracles:
+      - "0x9b0827104b1a0aeAeC1b6B9136043D66c602f9fC"
+      - "0xB987781CF2ffe675D44E739B08440fC6b7e77233"
+      - "0xc8C14D282b88F4532Ef49527f792ec34bb8193c7"
+      - "0xcfEc6EFB6510158fFa0a41C40641ccb6ffc63763"
+      - "0xabe5E6A896368488b2E75e60cF9adB8dC0B1b7ba"
+      - "0xD1b2d8Dd8Af57EdB16d07398C957fbd75F3F74A1"
+      - "0xABfAaD2e816Af645f5DfC50bC45233Faa588B891"
+      - "0xb0dD999890B8437c908c1c4a8A3a5F55496bA371"
+      - "0x3a93B328f508321A50316a421Af58655eD8C4Fd8"
+      - "0xF87071e64c6B050bF6a529069188b639d86F15bD"
     wrapped_native: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    pendle_router: "0x888888888889758F76e7103c6CbF23ABbF58F946"
+    multicaller: "0x0000000000002Bdbf1Bf3279983603Ec279CC6dF"
+    multicaller_with_sender: "0x00000000002Fd5Aeb385D324B580FCa7c83823A0"
+    multicaller_with_signer: "0x000000000000D9ECebf3C23529de49815Dac1c4c"
 
   # Deployment configuration
 deployment:
   owner: ${OWNER}
   deployer: ${DEPLOYER}
-  multisig: ${MULTISIG}
+  multisig: "0x655231493557bb07df178Bdc29a65435934937e3"
   deploy_curve: false
   deploy_mock: false
 
@@ -52,10 +109,19 @@ deployment:
     quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
     lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
     agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+    toki_pool_deployer: "0xc8192ad85b620da91493819257aa8605d948cdb900d1f75b78e60bff038a56d8"
+    toki_hook: "0xc8192ad85b620da91493819257aa8605d948cdb900be6b6c031463e6030be1e9"
+    asset_price_provider: "0xc8192ad85b620da91493819257aa8605d948cdb9004847285bdcbf3e03bbebc4"
+    v4_router: "0xc8192ad85b620da91493819257aa8605d948cdb900e94a774142e93c027f1310"
+    principal_token_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900ab90f1adfb3c7003e186f8"
+    toki_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900197aed04016ad002242344"
+    toki_lens: "0xc8192ad85b620da91493819257aa8605d948cdb90001f07047ef44a80386a5f1"
+    chainlink_oracle_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900be36a1129753ee02cfcd49"
+    wrapper_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900ff49436984e9ee03459a3f"
 
 # RPC configuration
 rpc:
   rpc_url: ${ETH_RPC_URL}
   explorer_api_key: ${ETHERSCAN_API_KEY}
-  # tenderly_access_token: ${TENDERLY_ACCESS_TOKEN}
+  # TENDERLY_EXPLORER_API_KEY: ${TENDERLY_EXPLORER_API_KEY}
   # tenderly_verifier_url: ${ETH_RPC_URL}/verify/etherscan

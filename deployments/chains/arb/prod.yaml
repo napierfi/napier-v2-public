@@ -4,15 +4,19 @@ chain:
   contracts:
     # Core contracts
     factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
-    factory_impl: "0x1AF1bBA647A9cE36515DeFF7dEf988cC40038Ac5"
+    factory_impl: "0xB65cc31E0daA89e271d3B71aa731FBDB86C74868"
     access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
-    access_manager_impl: "0xc5408eCcbb5386C75B2080e70c31Cf9054D97485"
+    access_manager_impl: "0x1775eb30212734a02B4C6709C98eBdC88Be26cb8"
+    access_manager_impl_deprecated: "0xc5408eCcbb5386C75B2080e70c31Cf9054D97485"
 
     # Module implementations
-    constant_fee_module_impl: "0x1a7169085dF04535B5ADd457f83405AEfb85Ddaf"
-    deposit_cap_verifier_module_impl: "0xB06819e0c1061d937626405D8C6D63A13Cd636A5"
-    pt_blueprint: "0x406B5FF5EB85a28710E99A9445808E5aB4F08483"
-    yt_blueprint: "0x1518496f0bbB32655A84f3211352724D7958fA06"
+    constant_fee_module_impl: "0xB6A7f2ff3AA790A15841E8D785f5828952ead723"
+    deposit_cap_verifier_module_impl: "0x51BaAD1B2eacd0E8D666328BfDe71Cb5bF6037C5"
+    limit_order_config_module_impl: ""
+    merkl_reward_proxy_impl: "0xe1d1D132456D3815Aa8A8AF116a407FFf139e942"
+    silo_reward_proxy_impl: "0x7A43635f92b9d4dD01555E3Da04D5284c9B85A88"
+    pt_blueprint: "0xd504C5c66ffd1cA0a58a2E17f147552808c07d77"
+    yt_blueprint: "0x0FB7CeF75D5a93ddb19b38c998835008c2681B31"
 
     # Resolver blueprints
     erc4626_resolver_blueprint: "0x067eEfB72007dde6F87514D061889D411648Aa78"
@@ -20,6 +24,7 @@ chain:
     constant_price_resolver_blueprint: "0xAE23318d6998972dB04dD4209e55e2Fb32df5aA7"
     custom_conversion_resolver_blueprint: "0x8a48b9878A8076Eb8cF4Ed1eFa12806E34492a35"
     external_price_resolver_blueprint: "0x393b7dae9977fB2fCeF4F6a6aA0170F153fa44d5"
+    chainlink_resolver_blueprint: "0xE3685D742F6713f35a92bf5938abE7BFBC162218"
     twocrypto_deployer: "0x34F6f5365c1b0830da9310A1d1F1b380a75ec5C8"
 
     # Periphery contracts
@@ -30,12 +35,52 @@ chain:
     quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
     quoter_impl: "0x46d5957A90d13B7b5f931c7A32d2a58c04ca286f"
     lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
-    lens_impl: "0x0Bef39C28Ab035c1C36f96337A4F13EcbD439d1B"
+    lens_impl: "0xbee550C0432C3eB0E0dcC741B788Ce704a4dAd0f"
+    lens_impl_deprecated: "0x2869e00e6cbf369f9ed4a280a4fb44ccaa7f44df"
+    wrapper_connector_impl: "0xB8B8dBB89740a1A705540FA0b832f7ed97b4109A"
+    wrapper_factory: "0x44445C34Daf19cF0D7721Ecf4be42F2538ac00c8"
+    price_provider_impl: "0x5eC99BD8541f0A7E1AD9ce07B858013BaCD622cD"
+    price_provider: "0x000000bA92d1f66c46722F0f4c035515d2b006A3"
+    principal_token_quoter: "0x0000003db4b656AbDEB9860a924AC59459ECFB41"
+    principal_token_quoter_impl: "0x9d8F09D0B1D90a154DB613Aa5c6905E82832606f"
+
+    # V4 contracts
+    pool_fee_module_impl: "0xB8483Da9476864f0aB04622E93A008062a4874C5"
+    toki_pool_deployer: "0x3333fa2BEd91533D8Fe0F1B641582343A8529469"
+    toki_pool_token_impl: "0xcdE671cee0A17cb4c5c5d546B8724Cbac7d87A1D"
+    toki_hook: "0xB046529771F5D01974913056843f1F0F77D81888"
+
+    # V4 periphery contracts
+    v4_router: "0x000000d8B6Fb27de7229923DB7649e50DC5937e8"
+    state_view: "0x2D3ABe6bb0bd600d8465805455e8AF5AB571AdD8"
+    toki_quoter: "0x0000005148D4f02f9B788938dD8f96582F15aBeb"
+    toki_quoter_impl: "0x18CFc0D5DD3e016b39D0EB2e43290485395a6332"
+    toki_lens: "0x000000896D3C2837797e9f334b4Cf366Bf645fdF"
+    toki_lens_impl: "0x71C3423E4CD1a1bd74288d90214F09d1Ad13EfbE"
+    toki_swap_bin_search: "0xB771B4bD483aC08be458Ae5353966115b39c6B7e"
+    toki_oracle: "0xe9aa72336E86Abcf572356823b4db70e26539fe8"
+    toki_oracle_impl: "0x2ce0B7C92896CD83d6046b127f788B65A4a91424"
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: "0x00000013f81B2e719d7183CFDd9f0e46CFbC8564"
+    toki_linear_price_oracle_impl: "0x104B27980bD285Bf918c0EbA6d07513f1401edfE"
+    toki_twap_oracle_impl: "0x61C93F072cba6228c166d0eaAa443066f02e5Bb0"
+
+    # wrapper implementation
+    atoken_wrapper_impl: "0xeB528A9e6ff1b6C23Ab286BF7c064cCc4CAC8087"
+
+    # External contracts
+    pyth_price_feed: "0xff1a0f4744e8582DF1aE09D5611b887B6a12925C"
+    wrapped_native: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+    pendle_router: "0x888888888889758F76e7103c6CbF23ABbF58F946"
+    multicaller: "0x0000000000002Bdbf1Bf3279983603Ec279CC6dF"
+    multicaller_with_sender: "0x00000000002Fd5Aeb385D324B580FCa7c83823A0"
+    multicaller_with_signer: "0x000000000000D9ECebf3C23529de49815Dac1c4c"
 
 deployment:
   owner: ${OWNER}
   deployer: ${DEPLOYER}
-  multisig: ${MULTISIG}
+  multisig: "0x655231493557bb07df178Bdc29a65435934937e3"
   deploy_curve: false
   deploy_mock: false
   salts:
@@ -45,7 +90,16 @@ deployment:
     quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
     lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
     agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+    toki_pool_deployer: "0xc8192ad85b620da91493819257aa8605d948cdb900d1f75b78e60bff038a56d8"
+    toki_hook: "0xc8192ad85b620da91493819257aa8605d948cdb900be6b6c031463e6030be1e9"
+    asset_price_provider: "0xc8192ad85b620da91493819257aa8605d948cdb9004847285bdcbf3e03bbebc4"
+    v4_router: "0xc8192ad85b620da91493819257aa8605d948cdb900e94a774142e93c027f1310"
+    principal_token_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900ab90f1adfb3c7003e186f8"
+    toki_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900d0d52092e9b6b2011b8d0f"
+    toki_lens: "0xc8192ad85b620da91493819257aa8605d948cdb90050ea37e4d4daad03adfe06"
+    chainlink_oracle_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900be36a1129753ee02cfcd49"
+    wrapper_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900ff49436984e9ee03459a3f"
 
 rpc:
   rpc_url: ${ARB_RPC_URL}
-  explorer_api_key: ${ARBSCAN_API_KEY} 
+  explorer_api_key: ${ETHERSCAN_V2_API_KEY}

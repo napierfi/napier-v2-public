@@ -11,6 +11,9 @@ chain:
     # Module implementations
     constant_fee_module_impl: "0xBDf232B6806c87871F8F5654DC41603d90B9aD6E"
     deposit_cap_verifier_module_impl: "0x06f7555441dEd67F4F42f5FEdBeEd4a2eb6A3aFA"
+    limit_order_config_module_impl: ""
+    chainlink_resolver_blueprint: "0x5F44286B6AA9D7aAEC73abcF627e32b0E048fC9a"
+    merkl_reward_proxy_impl: "0x393b7dae9977fB2fCeF4F6A6aA0170F153fa44d5"
     pt_blueprint: "0x208CD7DC528BD3069f09daCE8abfD548d1326a25"
     yt_blueprint: "0x39719d3c7dFA07de67E421b5110eF171Fa6608d1"
 
@@ -30,12 +33,21 @@ chain:
     quoter: "0x0000006182e8f8B89419159efe131ed65764bCbd"
     quoter_impl: "0x0d27F61b4ec6cD1dF96f204DF703Ae68cd1EaC92"
     lens: "0x0000006178Ee874E0AE58B131B8A5FcBe78cab2F"
-    lens_impl: "0x17ea1FAec40431785D42C97856E26CE8a1A2B39b"
+    lens_impl: "0x4A05a5D6578CDAA69Ab6E2b2F9604EdFD176DFf5"
+    wrapper_connector_impl: "0x8B472134DDb05d47d63b10531F58C17865bDd40f"
+    wrapper_factory: "0x1a7169085dF04535B5ADd457f83405AEfb85Ddaf"
+
+    # wrapper implementation
+    atoken_wrapper_impl: ""
+
+    # External contracts
+    wrapped_native: "0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8"
+    pendle_router: "0x888888888889758F76e7103c6CbF23ABbF58F946"
 
 deployment:
   owner: ${OWNER}
   deployer: ${DEPLOYER}
-  multisig: ${MULTISIG}
+  multisig: "0x655231493557bb07df178Bdc29a65435934937e3"
   deploy_curve: false
   deploy_mock: false
   salts:
@@ -49,3 +61,5 @@ deployment:
 rpc:
   rpc_url: ${MANTLE_RPC_URL}
   explorer_api_key: ${MANTLESCAN_API_KEY}
+  verifier: blockscout
+  verifier_url: https://explorer.mantle.xyz:443/api/

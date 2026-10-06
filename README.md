@@ -40,7 +40,15 @@ forge test --dynamic-test-linking \
 
 ## Networks and deployments
 
-Contracts require a Cancun-compatible EVM. TokiHook additionally requires Uniswap v4 PoolManager and Permit2 deployments. The records in `deployments/chains/` are retained historical public records, not a verified address manifest for this contract snapshot. Operational deployment scripts are outside the public port's scope; the build and local tests do not deploy to a live network.
+Contracts require a Cancun-compatible EVM. TokiHook additionally requires Uniswap v4 PoolManager and Permit2 deployments. Operational deployment scripts are outside the public port's scope; the build and local tests do not deploy to a live network.
+
+The 17 YAML manifests in `deployments/chains/` are copied byte-for-byte from `dev/uniswap` at `3b5bc6ddbbb692221f41d4fa15c25e6b7bfc3fbf`. They include production, Ethereum/Arbitrum staging, and Napier devnet configurations, using the source's `avax/` path for Avalanche. Deployment logs are not included. Empty entries and environment-variable placeholders are preserved. These records are not an on-chain verification or a guarantee that deployed bytecode matches this contract snapshot.
+
+To generate an environment file containing the scalar contract addresses, use `deployments/scripts/get-env.sh` with [Mike Farah's yq v4](https://github.com/mikefarah/yq). Address lists such as `pyth_oracles` remain in the YAML and are not exported as scalar environment variables.
+
+```sh
+bash deployments/scripts/get-env.sh robinhood prod /tmp/napier-robinhood.env
+```
 
 ## Known limitations
 

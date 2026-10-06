@@ -11,6 +11,7 @@ chain:
     # Module implementations
     constant_fee_module_impl: "0x9C5Bb5aa50F184C9F708c65e66e0BFeE1Ac5fcE7"
     deposit_cap_verifier_module_impl: "0x61BE4601187075FFBCb0A12D22C998aC495C8180"
+    limit_order_config_module_impl: ""
     pt_blueprint: "0xF2E29696005CE9CC1F8cbe547ec4B7F99844CAeA"
     yt_blueprint: "0x916cb9d3b946131ea8eD54B7D6981637798d36F7"
 
@@ -20,6 +21,7 @@ chain:
     constant_price_resolver_blueprint: "0xa733D5c3938A9Cd78e65171F534954830CB5c215"
     custom_conversion_resolver_blueprint: "0xEC4bdEad0717b9383B1a9B2b2f3A9b832ee81D4B"
     external_price_resolver_blueprint: "0x58e575f710d87D1F946E70703397fFC9f9c08131"
+    chainlink_resolver_blueprint: "0x913a977eCb5780de7a6e1c074D9Be427C7B7CcE0"
     twocrypto_deployer: "0x121E7a5948D8b0d2B3EdE1f397b7f24Ac38dE306"
 
     # Periphery contracts
@@ -30,13 +32,19 @@ chain:
     quoter: "0x000000a060EEA80ed4a8E4d32B18cC9eB71d868a"
     quoter_impl: "0xF4dF9FA6e4eFcDed77AEa08e5C4620ee137F82Dc"
     lens: "0x00000059Dbde885CF1F25b58b77e4cEa773ac887"
-    lens_impl: "0x557563e67d2A72D5eE7FF0F704e0eDd74CCb724a"
+    lens_impl: "0x3048ba6875dd43156c4d60fea7cb7f1f84f48471"
+    impersonator: "0x5546B45733d4F64166C6c7fA3AB02BA1506f5B0E"
+    wrapper_factory: "0xD5c58eca73e7D1926968D2A4738d6077904e2913"
+    wrapper_connector_impl: "0x818da7bedcc49e9536e21e609134fef8a9e92c64"
+
+    # Wrapper implementation
+    atoken_wrapper_impl: "0x3a45bb46fa10c053fb5d453a25846a7c2956d785"
 
     createx: "0x5C3c091373Ff74c2553dD5eD2f54f95173467C3d"
-
 deployment:
   owner: "${OWNER}"
   deployer: "${DEPLOYER}"
+  multisig: "0x7ECa4950E1c3C1aEEbC322eEB90820786419d5E4"
   deploy_curve: false
   deploy_mock: false
   salts:
@@ -49,4 +57,6 @@ deployment:
 
 rpc:
   rpc_url: ${HYPER_RPC_URL}
-  explorer_api_key: ""
+  explorer_api_key: "non-key"
+  verifier: blockscout
+  verifier_url: https://hyperscan.gas.zip/api/

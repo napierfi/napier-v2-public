@@ -1,0 +1,108 @@
+chain:
+  name: "Arbitrum Staging"
+  chain_id: 42161
+  contracts:
+    # Core contracts
+    factory: "0x471c5F07f2616863f6003435CD929d62F23b69C4"
+    factory_impl: "0xdeF58C8fbF6735123fAF52d89ED5966F652B4A42"
+    access_manager: "0x0e3Ab2ef456673c9FcE4Cf3D3fAe9b07Be609725"
+    access_manager_impl: "0x5A2921533fa6A55D4635Db58B17C827FD67D759D"
+    access_manager_impl_deprecated: ""
+
+    # Module implementations
+    constant_fee_module_impl: "0x4C4d8d71a6cC31eEb1490D8c4e6581f834f88352"
+    deposit_cap_verifier_module_impl: "0xbe4a374c1B69F765398ad2621C47F17d44CF26E9"
+    limit_order_config_module_impl: ""
+    merkl_reward_proxy_impl: ""
+    silo_reward_proxy_impl: ""
+    pt_blueprint: "0xDa28e53FAF54F5DC1913B6e3459CBC065871B226"
+    yt_blueprint: "0x951907C4A8CC4C06fa37DaA4D62B8f1F7Ef49cD9"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x00aa0736cE624a60Ab13A90F5b5a55728092aF06"
+    share_price_resolver_blueprint: "0xD709B0a6c6F2c8Bc174363926a3AF7DBee6A67cb"
+    constant_price_resolver_blueprint: "0x632aeDF53F2D9a2C8CF5B28cb4Fe82822dA4A19E"
+    custom_conversion_resolver_blueprint: "0x8E2DA7cB357eec033f82D1b5Fd65D5E23aaaaC57"
+    external_price_resolver_blueprint: "0xC951bF8CB72DF538109359FF7ECcD0FBA8B2115c"
+    chainlink_resolver_blueprint: "0xb07Ec7DB3916E864032Cf1085414DF524C77B7bf"
+    twocrypto_deployer: "0xfe22cdb38290a010f0dcc4e8074c9eaa6f5b337e"
+
+    # Periphery contracts
+    default_connector_factory: "0xe2A831daA694E4203ECD1740a2039DF63D26Bc0B"
+    vault_connector_registry: "0x1DA61350AD3c45DeA71dEE7662c8623E35e9CF26"
+    aggregation_router: "0x000000B119b795AcD20833fAF3ad001f5295E114"
+    twocrypto_zap: "0x0000003f53625024F9AFD49957f399BEDc73874d"
+    quoter: "0x0096486b768Ea2AAC736d2ae3a9910B5c0FD3E24"
+    quoter_impl: "0x89D0d1D4865de16cC76A8fa8fC04d2060AF6C859"
+    lens: "0x0020a23614c8534A47f91530b9bA18D9705AF4C4"
+    lens_impl: "0xf753910684746BA96C2f4F79f1e1a93D6A9e6FaF"
+    lens_impl_deprecated: ""
+    wrapper_connector_impl: "0x521373C8ae7cb88d1DD7285691AB62579c897975"
+    wrapper_factory: "0x00000073b4A0CaaEC8915482F9b4bd99b838b593"
+    price_provider_impl: ""
+    price_provider: "0x000000bA92d1f66c46722F0f4c035515d2b006A3"
+    principal_token_quoter: "0x000000E4B69F38A9f253deA120c40605F2e7Cb20"
+    principal_token_quoter_impl: "0x034c45889E206f6B87584f04038560FE8337CAD7"
+
+    # V4 contracts
+    pool_fee_module_impl: "0x7D29d9aBf42DCcE14839B60Ed7d5A2994C850262"
+    toki_pool_deployer: "0x0000000CBC3f417c815A988E113794F0510D5E0e"
+    toki_pool_token_impl: "0xA8bf2b2b4c435f03F02495B0c91552D9E7c7B2ac"
+    toki_hook: "0x982F06E8218cA86676C6C0a45172fbBDbb711888"
+    toki_hook_logic: "0x21c5Fa1e6e9157F65F6A4b2619f587F531dC4BB1"
+
+    # V4 periphery contracts
+    v4_router: "0x000000444B424b5DB30adD15c964CD5bcA053D87"
+    state_view: "0xe781de81f8A98329c62DE29e7b163d8ACBeF7981"
+    toki_quoter: "0x0000004F9172C752b83E29fC0212920A06E64696"
+    toki_quoter_impl: "0xd3727219302a2A7223EB65E8757f88c7A2b797c6"
+    toki_lens: "0x000000Caab890292bBe1072359eb04fc386Cf531"
+    toki_lens_impl: "0xF2292D84eDBd83992aDe5B23de6581e0c8a4cac7"
+    toki_swap_bin_search: "0xe788c4D83597FBA93239d09A3e71691Ab2e1dc13"
+    toki_oracle: "0xD90Bd9Ff51Dd9D981B69f90C8B6E8FE105B302D8"
+    toki_oracle_impl: "0x19E3ffd80c97D471c1a8d4fcB17edE0E1B525DD4"
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: "0x00000079d1B251be2c9d0D940f20B4e4562318Fc"
+    toki_linear_price_oracle_impl: "0xd9044584AE07ae43437E35b86BF0848A977307Cd"
+    toki_twap_oracle_impl: "0x543D6c6078137F50b267Fdf4CF10362895aAa0D8"
+
+    # wrapper implementation
+    atoken_wrapper_impl: ""
+
+    # External contracts
+    wrapped_native: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+    pendle_router: "0x888888888889758F76e7103c6CbF23ABbF58F946"
+    multicaller: "0x0000000000002Bdbf1Bf3279983603Ec279CC6dF"
+    multicaller_with_sender: "0x00000000002Fd5Aeb385D324B580FCa7c83823A0"
+    multicaller_with_signer: "0x000000000000D9ECebf3C23529de49815Dac1c4c"
+
+    # Mock
+    mock_vault_factory: "0x4A4E492cB8D30Ef7c787c4E5D59109C5FFdfD25b" 
+
+deployment:
+  owner: ${STAGING_OWNER}
+  deployer: ${STAGING_DEPLOYER}
+  multisig: ""
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "${SALT_STAGING_NAPIER_ACCESS_MANAGER}"
+    factory: "${SALT_STAGING_FACTORY}"
+    twocrypto_zap: "${SALT_STAGING_TWOCRYPTO_ZAP}"
+    quoter: "${SALT_STAGING_QUOTER}"
+    lens: "${SALT_STAGING_LENS}"
+    agg_router: "${SALT_STAGING_AGG_ROUTER}"
+    toki_pool_deployer: "${SALT_STAGING_TOKI_POOL_DEPLOYER}"
+    toki_hook: "${SALT_STAGING_TOKI_HOOK}"
+    asset_price_provider: "${SALT_STAGING_ASSET_PRICE_PROVIDER}"
+    v4_router: "${SALT_STAGING_V4_ROUTER}"
+    principal_token_quoter: "${SALT_STAGING_PRINCIPAL_TOKEN_QUOTER}"
+    toki_quoter: "${SALT_STAGING_TOKI_QUOTER}"
+    toki_lens: "${SALT_STAGING_TOKI_LENS}"
+    chainlink_oracle_factory: "${SALT_STAGING_CHAINLINK_ORACLE_FACTORY}"
+    wrapper_factory: "${SALT_STAGING_WRAPPER_FACTORY}"
+
+rpc:
+  rpc_url: ${ARB_RPC_URL}
+  explorer_api_key: ${ETHERSCAN_V2_API_KEY}

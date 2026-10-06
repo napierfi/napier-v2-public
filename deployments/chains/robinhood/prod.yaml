@@ -1,0 +1,104 @@
+chain:
+  name: "Robinhood Chain"
+  chain_id: 4663
+  contracts:
+    # Core contracts
+    factory: "0x0000001afbCA1E8CF82fe458B33C9954A65b987B"
+    factory_impl: "0x08c83cF4B72c863Db6831e7795A22bc5d510e19a"
+    access_manager: "0x000000C196dBD8c8b737F95507C2C39271CdcC99"
+    access_manager_impl: "0xa47880eaE129Dd6dE7c6F33F343Eb368E4dDC0bc"
+
+    # Module implementations
+    constant_fee_module_impl: "0xe9d7430c3EBB07140290a6FC5689992dbcA2F995"
+    deposit_cap_verifier_module_impl: "0x45ab70f579e5AA53eFC978e7594224D61a6FE2CD"
+    orderbook_configuration_module_impl: ""
+    morpho_reward_proxy_impl: ""
+    merkl_reward_proxy_impl: ""
+    wrapper_reward_proxy_impl: ""
+    silo_reward_proxy_impl: ""
+    pt_blueprint: "0x29CBe962429E27706437097b701D320BAB73e71F"
+    yt_blueprint: "0xd6F01B18428e40869933A59DfCeDDA6cd4A9dC57"
+
+    # Resolver blueprints
+    erc4626_resolver_blueprint: "0x61842cd4aA6d3a88Cc9B28613D4aC5e395CcD19C"
+    share_price_resolver_blueprint: "0x65C314Ef9b5459F5F1B1d3E17b5c6660b10961Db"
+    constant_price_resolver_blueprint: "0x58838A1F0ED2eCE88A003BD5dfb11e729124444f"
+    custom_conversion_resolver_blueprint: "0x1734f6277e23606b0355B648Ae68Fa60d72DDbdf"
+    external_price_resolver_blueprint: "0x4686BF21831347319d67EffAF4d57ef5CfB0ff5E"
+    chainlink_resolver_blueprint: "0x9F8eeA10e27C41D1EE4177B9830CEe2CD6A03214"
+    twocrypto_deployer: ""
+
+    # Periphery contracts
+    default_connector_factory: "0xD5c58eca73e7D1926968D2A4738d6077904e2913"
+    vault_connector_registry: "0xf135C384dAfaF6b34C774d8F014DBd8DFA133Aa3"
+    aggregation_router: "0x000000371a8d1064AAAFC4DCad3a5ec91f8858DB"
+    twocrypto_zap: ""
+    quoter: ""
+    lens: ""
+    quoter_impl: ""
+    lens_impl: ""
+    impersonator: ""
+    wrapper_connector_impl: "0x1b2386461b9CA8D39A3835770630597248597Cb5"
+    wrapper_factory: "0x44445C34Daf19cF0D7721Ecf4be42F2538ac00c8"
+    price_provider_impl: "0x641981084b86c2EC57302a134C30e9b0ef759f32"
+    price_provider: "0x000000bA92d1f66c46722F0f4c035515d2b006A3"
+    principal_token_quoter: "0x0000003db4b656AbDEB9860a924AC59459ECFB41"
+    principal_token_quoter_impl: "0xCca23E401E7CED3b07A6e83D9b73BB0E383869B7"
+
+    # V4 contracts
+    pool_fee_module_impl: "0x1451e304ec493b072943BFcE36c3129D20378332"
+    toki_pool_deployer: "0x3333fa2BEd91533D8Fe0F1B641582343A8529469"
+    toki_pool_token_impl: "0x129D398a6116a13Cc0D1AE8833B0490C2D53Cf37"
+    toki_hook: "0x81d1AFeb7730A244705e69f752C78c0346D75888"
+    toki_hook_logic: "0x17CF5BD78DA0e8f7f3d281444ee001379fcE02f0"
+
+    # V4 periphery contracts
+    v4_router: "0x00000000D6C19A173f3C739F01fD171A7C9C245b"
+    state_view: "0x146718615bb9f49CDf665eC851Eb6857855828bD"
+    toki_quoter: "0x000000f682bfa913574bFa448C33260CB598CfC7"
+    toki_quoter_impl: "0xfd876910E6DC312518e5442f48495F7F20e6Ba4F"
+    toki_lens: "0x00000031F662013D68E6CD0ceFe97043AE0ac5b8"
+    toki_lens_impl: "0x558Ed45e730311EE4393Bf539e4f8741B19fcE60"
+    toki_swap_bin_search: "0xB47D0132b31D19018b088c8A2504B937599F273f"
+    toki_oracle: "0xCB338242A82796FFaC0363feF98B1e1225c9C2A9"
+    toki_oracle_impl: "0x2a9b0213B5C3FaD0fD031fC9D56E66ac6a039F4D"
+
+    # Chainlink oracle contracts
+    chainlink_compt_oracle_factory: "0x00000013f81B2e719d7183CFDd9f0e46CFbC8564"
+    toki_linear_price_oracle_impl: "0xBF33031BD2C04531E688adB5E517e5477c2A9367"
+    toki_twap_oracle_impl: "0xc5408eCcbb5386C75B2080e70c31Cf9054D97485"
+
+    # External contracts
+    feed_registry: ""
+    wrapped_native: "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73"
+    pendle_router: ""
+    multicaller: ""
+    multicaller_with_sender: "0x00000000002Fd5Aeb385D324B580FCa7c83823A0"
+    multicaller_with_signer: ""
+
+deployment:
+  owner: ${OWNER}
+  multisig: ${DEPLOYER}
+  deploy_curve: false
+  deploy_mock: false
+  salts:
+    napier_access_manager: "0xc8192ad85b620da91493819257aa8605d948cdb900b351bd5ba0760903622f74"
+    factory: "0xc8192ad85b620da91493819257aa8605d948cdb9001223f5c9b408c50367babe"
+    twocrypto_zap: "0xc8192ad85b620da91493819257aa8605d948cdb9000dac06d5005c6a0329621a"
+    quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900f70dbdd3759de403a188c9"
+    lens: "0xc8192ad85b620da91493819257aa8605d948cdb900871408979105af015a177d"
+    agg_router: "0xc8192ad85b620da91493819257aa8605d948cdb900fb5f6f9164448e009945c3"
+    toki_pool_deployer: "0xc8192ad85b620da91493819257aa8605d948cdb900d1f75b78e60bff038a56d8"
+    toki_hook: "0xc8192ad85b620da91493819257aa8605d948cdb900be6b6c031463e6030be1e9"
+    asset_price_provider: "0xc8192ad85b620da91493819257aa8605d948cdb9004847285bdcbf3e03bbebc4"
+    v4_router: "0xc8192ad85b620da91493819257aa8605d948cdb900e94a774142e93c027f1310"
+    principal_token_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900ab90f1adfb3c7003e186f8"
+    toki_quoter: "0xc8192ad85b620da91493819257aa8605d948cdb900197aed04016ad002242344"
+    toki_lens: "0xc8192ad85b620da91493819257aa8605d948cdb90001f07047ef44a80386a5f1"
+    chainlink_oracle_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900be36a1129753ee02cfcd49"
+    wrapper_factory: "0xc8192ad85b620da91493819257aa8605d948cdb900ff49436984e9ee03459a3f"
+
+rpc:
+  rpc_url: ${ROBINHOOD_RPC_URL}
+  verifier: custom
+  verifier_url: https://api.etherscan.io/v2/api?chainid=4663&apikey=${ETHERSCAN_API_KEY}
