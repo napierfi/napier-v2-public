@@ -51,4 +51,6 @@ Contracts require a Cancun-compatible EVM. TokiHook additionally requires Uniswa
 
 The existing reports in `audits/` are preserved; their presence does not establish audit coverage for this release snapshot.
 
-The root `LICENSE` contains GPL v3, while imported Napier Solidity headers and `package.json` declare BUSL-1.1. Some upstream-derived fixtures have other file-specific declarations, including `UNLICENSED`. These declarations have not been rewritten, and the root license has not been changed. The responsible rights holders must reconcile the publication terms before this release is merged; this repository does not establish a uniform resolved license for the imported snapshot.
+Napier-authored code follows the `BUSL-1.1` declarations in `release/uniswap-v4`. The root [LICENSE](./LICENSE) contains the canonical Business Source License 1.1 text. Imported Solidity headers and package metadata are preserved exactly; upstream-derived files and fixtures retain their file-specific MIT/GPL/UNLICENSED declarations.
+
+The source revision does not publish the license parameters: Licensor, Additional Use Grant, Change Date, or Change License. These have not been inferred or invented. The canonical license requires these parameters to be specified by the licensor before a complete project-specific license can be published.
