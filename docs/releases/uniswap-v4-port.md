@@ -55,10 +55,10 @@ The credential-free command in [README](../../README.md) and public CI includes 
 
 Excluded fork suites remain available for explicit runs with valid RPC access. The Morpho MEVUSDC fork suite was exercised with locally supplied RPC credentials; the remaining fork integrations, live aggregator API, and symbolic suites were not run. `AggregationRouterTest` additionally requires opt-in FFI, `bash`, `curl`, `jq`, and live external API access. Local script evidence does not establish a live deployment.
 
-## Publication review and merge requirements
+## Publication review and license parameters
 
 Two independent read-only reviews covered publication exposure and migration consistency. No evidence-backed production credential leak was identified in the selected files; patterned fixture keys and embedded deployment bytecode were classified as test data, not production secrets. The reviews were scoped migration checks, not a complete smart-contract audit or exhaustive secret scan. Upstream attribution, including the exact Pendle oracle reference in `LibOracle`, is preserved.
 
 Napier-authored code follows the source's BUSL-1.1 declarations. The root `LICENSE` contains the unmodified canonical [Business Source License 1.1 text](https://spdx.org/licenses/BUSL-1.1.html). Imported Solidity headers and package metadata remain exact source snapshots; other imported files retain their file-specific MIT/GPL/UNLICENSED declarations.
 
-The pinned source contains no project-specific BUSL license document or values for Licensor, Additional Use Grant, Change Date, or Change License. Its README states a BUSL effective date of March 17, 2026; that date is not a declared Change Date. The canonical license covenants require an Additional Use Grant (or explicit `None`), Change Date, and compatible Change License. These terms must be supplied by the licensor; none is inferred from a prior public license or from the source README's effective date. The public pull request remains draft until the project-specific parameters are supplied.
+The pinned source contains no project-specific BUSL license document or values for Licensor, Additional Use Grant, Change Date, or Change License. Its README states a BUSL effective date of March 17, 2026; that date is not a declared Change Date. The canonical license covenants require an Additional Use Grant (or explicit `None`), Change Date, and compatible Change License. These terms must be supplied by the licensor; none is inferred from a prior public license or from the source README's effective date.
